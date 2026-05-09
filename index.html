@@ -38,8 +38,10 @@
 
         <!-- Upgrade Screen -->
         <section id="upgrade-screen" class="hidden" role="dialog" aria-labelledby="upgrade-title" aria-modal="true">
-            <img src="lootbox_opening_text.png" alt="LOOTBOX UNBOXING" class="upgrade-title-image">
-            <div class="upgrade-wave-counter" id="upgrade-wave-counter" aria-live="polite">lasted 0 waves</div>
+            <div class="upgrade-header">
+                <img src="lootbox_opening_text.png" alt="LOOTBOX UNBOXING" class="upgrade-title-image">
+                <div class="upgrade-wave-counter" id="upgrade-wave-counter" aria-live="polite">lasted 0 waves</div>
+            </div>
             
             <div class="lootbox-container">
                 <div class="lootbox" id="lootbox">
@@ -59,7 +61,7 @@
                     <button id="continue-btn" class="continue-button" aria-label="Continue to next wave">Continue</button>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Game Over Screen -->
         <section id="game-over-screen" class="hidden" role="dialog" aria-labelledby="game-over-title" aria-modal="true">
