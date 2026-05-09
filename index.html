@@ -8,30 +8,44 @@
 </head>
 <body>
     <div id="game-container">
-        <!-- Top Bar -->
-        <header id="top-bar" role="banner">
+        <!-- Stats Area (Left Column) -->
+        <aside id="stats-area" role="complementary" aria-label="Game statistics">
             <div class="stat" aria-label="Current wave number">Wave: <span id="wave">1</span></div>
             <div class="stat" aria-label="Player lives remaining">Lives: <span id="lives">3</span></div>
             <div class="stat" aria-label="Current score">Score: <span id="score">0</span></div>
             <div class="stat" aria-label="Current combo count">Combo: <span id="combo">0</span></div>
             <div class="stat" aria-label="Enemies defeated this wave">Enemies Defeated: <span id="enemies-defeated">0</span>/<span id="enemies-to-defeat">0</span></div>
             <div class="stat" id="wave-counter" aria-live="polite" aria-atomic="true">lasted 0 waves</div>
-            <div class="slowmo-container">
-                <div class="slowmo-title">SLO MO</div>
-                <div id="slowmo-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-label="Slow-motion ability cooldown">
-                    <div id="slowmo-fill"></div>
-                    <span id="slowmo-text">SPACE</span>
+            
+            <!-- Top Bar (now only for slow-mo) -->
+            <header id="top-bar" role="banner">
+                <div class="slowmo-container">
+                    <div class="slowmo-title">SLO MO</div>
+                    <div id="slowmo-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-label="Slow-motion ability cooldown">
+                        <div id="slowmo-fill"></div>
+                        <span id="slowmo-text">SPACE</span>
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
+        </aside>
 
-        <!-- Game Area -->
+        <!-- Game Area (Center) -->
         <main id="game-area" role="main" aria-label="Game play area">
             <div id="enemies-container" aria-live="polite" aria-atomic="false"></div>
             <div id="player-line" aria-hidden="true"></div>
         </main>
 
-        <!-- Input Area -->
+        <!-- Upgrades Display (Right Column) -->
+        <aside id="upgrades-display" class="upgrades-display" role="complementary" aria-labelledby="upgrades-title">
+            <div class="upgrades-header">
+                <h2 id="upgrades-title">Your Upgrades</h2>
+            </div>
+            <div class="upgrades-list" id="upgrades-list">
+                <p class="no-upgrades">No upgrades yet. Complete waves to earn upgrades!</p>
+            </div>
+        </aside>
+
+        <!-- Input Area (Bottom) -->
         <footer id="input-area" role="contentinfo">
             <input type="text" id="typing-input" placeholder="Type words here..." autocomplete="off" aria-label="Type words to destroy enemies" spellcheck="false">
         </footer>
@@ -64,16 +78,7 @@
             </div>
         </section>
 
-        <!-- Upgrades Display -->
-        <aside id="upgrades-display" class="upgrades-display" role="complementary" aria-labelledby="upgrades-title">
-            <div class="upgrades-header">
-                <h2 id="upgrades-title">Your Upgrades</h2>
-            </div>
-            <div class="upgrades-list" id="upgrades-list">
-                <p class="no-upgrades">No upgrades yet. Complete waves to earn upgrades!</p>
-            </div>
-        </aside>
-
+        
         <!-- Game Over Screen -->
         <section id="game-over-screen" class="hidden" role="dialog" aria-labelledby="game-over-title" aria-modal="true">
             <div class="game-over-content">
