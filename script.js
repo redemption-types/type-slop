@@ -738,11 +738,23 @@ class TypeSlopGame {
         const element = document.createElement('div');
         element.className = `enemy ${enemy.type}`;
         
-        // Create text content with HP for multi-HP enemies
+        // Create HP display for multi-HP enemies
         if ((enemy.type === 'tank' || enemy.type === 'double') && enemy.hp > 1) {
-            element.textContent = `${enemy.word} HP:${enemy.hp}`;
+            const hpDisplay = document.createElement('div');
+            hpDisplay.className = 'enemy-hp';
+            hpDisplay.textContent = `HP:${enemy.hp}`;
+            
+            const wordDisplay = document.createElement('div');
+            wordDisplay.className = 'enemy-word';
+            wordDisplay.textContent = enemy.word;
+            
+            element.appendChild(hpDisplay);
+            element.appendChild(wordDisplay);
         } else {
-            element.textContent = enemy.word;
+            const wordDisplay = document.createElement('div');
+            wordDisplay.className = 'enemy-word';
+            wordDisplay.textContent = enemy.word;
+            element.appendChild(wordDisplay);
         }
         
         element.style.position = 'absolute';
@@ -827,17 +839,47 @@ class TypeSlopGame {
             
             // Update enemy text to show new HP or word change
             if (enemy.type === 'tank') {
+                const hpDisplay = enemy.element.querySelector('.enemy-hp');
+                const wordDisplay = enemy.element.querySelector('.enemy-word');
+                
                 if (enemy.hp > 1) {
-                    enemy.element.textContent = `${enemy.word} HP:${enemy.hp}`;
+                    if (!hpDisplay) {
+                        // Add HP display if it doesn't exist
+                        const hpDiv = document.createElement('div');
+                        hpDiv.className = 'enemy-hp';
+                        hpDiv.textContent = `HP:${enemy.hp}`;
+                        enemy.element.insertBefore(hpDiv, wordDisplay);
+                    } else {
+                        hpDisplay.textContent = `HP:${enemy.hp}`;
+                    }
                 } else {
-                    enemy.element.textContent = enemy.word;
+                    // Remove HP display if HP is 1
+                    if (hpDisplay) {
+                        hpDisplay.remove();
+                    }
                 }
+                wordDisplay.textContent = enemy.word;
             } else if (enemy.type === 'double') {
+                const hpDisplay = enemy.element.querySelector('.enemy-hp');
+                const wordDisplay = enemy.element.querySelector('.enemy-word');
+                
                 if (enemy.hp > 1) {
-                    enemy.element.textContent = `${enemy.word} HP:${enemy.hp}`;
+                    if (!hpDisplay) {
+                        // Add HP display if it doesn't exist
+                        const hpDiv = document.createElement('div');
+                        hpDiv.className = 'enemy-hp';
+                        hpDiv.textContent = `HP:${enemy.hp}`;
+                        enemy.element.insertBefore(hpDiv, wordDisplay);
+                    } else {
+                        hpDisplay.textContent = `HP:${enemy.hp}`;
+                    }
                 } else {
-                    enemy.element.textContent = enemy.word; // Show new word after swap
+                    // Remove HP display if HP is 1
+                    if (hpDisplay) {
+                        hpDisplay.remove();
+                    }
                 }
+                wordDisplay.textContent = enemy.word; // Show new word after swap
             }
         }
         
