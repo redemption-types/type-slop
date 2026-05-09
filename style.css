@@ -1,0 +1,356 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: #1a1a1a;
+    color: #fff;
+    overflow: hidden;
+}
+
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Top Bar */
+#top-bar {
+    background: #2a2a2a;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #444;
+}
+
+.stat {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#slowmo-bar {
+    position: relative;
+    width: 80px;
+    height: 20px;
+    background: #333;
+    border: 2px solid #666;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#slowmo-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00ff00, #00cc00);
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+#slowmo-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Game Area */
+#game-area {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+    overflow: hidden;
+    min-height: 400px;
+}
+
+#enemies-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#player-line {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #ff0000;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+/* Enemy Styles */
+.enemy {
+    position: absolute;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.1s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.enemy.normal {
+    background: #4a90e2;
+    border: 2px solid #357abd;
+    color: white;
+}
+
+.enemy.fast {
+    background: #e74c3c;
+    border: 2px solid #c0392b;
+    color: white;
+    font-size: 0.9em;
+}
+
+.enemy.tank {
+    background: #f39c12;
+    border: 2px solid #d68910;
+    color: white;
+    font-size: 1.1em;
+}
+
+.enemy.tank.hp-2::after {
+    content: " HP:2";
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+
+.enemy.matched {
+    background: #2ecc71 !important;
+    border-color: #27ae60 !important;
+    transform: scale(1.1);
+}
+
+.enemy.damaged {
+    animation: damage-flash 0.3s ease;
+}
+
+@keyframes damage-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Input Area */
+#input-area {
+    background: #2a2a2a;
+    padding: 20px;
+    border-top: 2px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#typing-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px;
+    font-size: 18px;
+    font-family: 'Courier New', monospace;
+    background: #1a1a1a;
+    border: 2px solid #666;
+    border-radius: 4px;
+    color: #fff;
+    text-align: center;
+    outline: none;
+}
+
+#typing-input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+}
+
+/* Screens */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.screen.hidden {
+    display: none !important;
+}
+
+#start-screen, #upgrade-screen, #game-over-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#start-screen.hidden, #upgrade-screen.hidden, #game-over-screen.hidden {
+    display: none !important;
+}
+
+#start-screen h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #4a90e2;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+#start-screen p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #ccc;
+}
+
+#upgrade-screen h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #f39c12;
+}
+
+#upgrade-options {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.upgrade-option {
+    background: #2a2a2a;
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 200px;
+    text-align: center;
+}
+
+.upgrade-option:hover {
+    background: #3a3a3a;
+    border-color: #4a90e2;
+    transform: translateY(-2px);
+}
+
+.upgrade-option h3 {
+    color: #4a90e2;
+    margin-bottom: 10px;
+}
+
+.upgrade-option p {
+    color: #ccc;
+    font-size: 14px;
+}
+
+#game-over-screen h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #e74c3c;
+}
+
+#game-over-screen p {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #ccc;
+}
+
+button {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #357abd;
+}
+
+/* Power-ups */
+.powerup {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
+
+.powerup.freeze {
+    background: #3498db;
+    border: 2px solid #2980b9;
+}
+
+.powerup.nuke {
+    background: #e74c3c;
+    border: 2px solid #c0392b;
+}
+
+.powerup.heal {
+    background: #2ecc71;
+    border: 2px solid #27ae60;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Slow-mo effect */
+.slowmo-active {
+    animation: slowmo-pulse 0.5s infinite;
+}
+
+@keyframes slowmo-pulse {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(180deg); }
+}
+
+/* Combo effect */
+.combo-popup {
+    position: absolute;
+    color: #f39c12;
+    font-size: 24px;
+    font-weight: bold;
+    pointer-events: none;
+    animation: combo-rise 1s ease-out forwards;
+}
+
+@keyframes combo-rise {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+}
