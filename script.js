@@ -570,6 +570,9 @@ class TypeSlopGame {
         this.typingInput.addEventListener('input', (e) => this.handleTyping(e));
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         
+        // Initialize upgrades display
+        this.updateUpgradesDisplay();
+        
         // Difficulty selection event listeners - using event delegation
         document.addEventListener('click', (e) => {
             console.log('Document click detected, target:', e.target);
@@ -1299,6 +1302,16 @@ class TypeSlopGame {
             // Apply upgrade effect
             this.currentUpgrade.apply(this.gameState);
             
+            // Store the upgrade in gameState
+            this.gameState.upgrades.push({
+                name: this.currentUpgrade.name,
+                description: this.currentUpgrade.description,
+                rarity: this.currentUpgrade.rarity
+            });
+            
+            // Update upgrades display
+            this.updateUpgradesDisplay();
+            
             // Hide upgrade screen
             this.upgradeScreen.classList.add('hidden');
             
@@ -1339,6 +1352,41 @@ class TypeSlopGame {
     updateEnemyDefeatedDisplay() {
         this.enemiesDefeatedDisplay.textContent = this.gameState.enemiesDefeated;
         this.enemiesToDefeatDisplay.textContent = this.gameState.totalEnemiesInWave;
+    }
+
+    updateUpgradesDisplay() {
+        const upgradesList = document.getElementById('upgrades-list');
+        
+        if (!upgradesList) return;
+        
+        // Clear existing content
+        upgradesList.innerHTML = '';
+        
+        if (this.gameState.upgrades.length === 0) {
+            // Show no upgrades message
+            upgradesList.innerHTML = '<p class="no-upgrades">No upgrades yet. Complete waves to earn upgrades!</p>';
+        } else {
+            // Display each upgrade
+            this.gameState.upgrades.forEach((upgrade, index) => {
+                const upgradeItem = document.createElement('div');
+                upgradeItem.className = `upgrade-item ${upgrade.rarity}`;
+                
+                upgradeItem.innerHTML = `
+                    <div class="upgrade-rarity">${upgrade.rarity.toUpperCase()}</div>
+                    <div class="upgrade-name">${upgrade.name}</div>
+                    <div class="upgrade-description">${upgrade.description}</div>
+                `;
+                
+                upgradesList.appendChild(upgradeItem);
+            });
+            
+            // Auto-scroll to the newest upgrade
+            setTimeout(() => {
+                if (upgradesList.lastElementChild) {
+                    upgradesList.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, 100);
+        }
     }
 }
 

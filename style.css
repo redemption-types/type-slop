@@ -1791,6 +1791,224 @@ body::before {
     }
 }
 
+/* Upgrades Display Styles */
+.upgrades-display {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: clamp(200px, 20vw, 280px);
+    max-height: 200px;
+    background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(30, 30, 50, 0.9) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 12px;
+    backdrop-filter: blur(15px) saturate(180%);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.upgrades-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 140, 0, 0.15) 100%);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.upgrades-header h2 {
+    margin: 0;
+    font-size: clamp(14px, 2.5vw, 16px);
+    font-weight: 600;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    letter-spacing: 0.5px;
+}
+
+.close-upgrades-btn {
+    display: none;
+}
+
+.upgrades-list {
+    padding: 8px 12px;
+    overflow-y: auto;
+    max-height: calc(200px - 50px);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+}
+
+.upgrades-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.upgrades-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.upgrades-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.4);
+    border-radius: 3px;
+}
+
+.upgrades-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 215, 0, 0.6);
+}
+
+.upgrade-item {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.upgrade-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--upgrade-color, #808080);
+    border-radius: 2px 0 0 2px;
+}
+
+.upgrade-item:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    border-color: var(--upgrade-color, #808080);
+    transform: translateX(-2px);
+}
+
+.upgrade-item.common {
+    --upgrade-color: #808080;
+}
+
+.upgrade-item.rare {
+    --upgrade-color: #4169E1;
+}
+
+.upgrade-item.epic {
+    --upgrade-color: #9932CC;
+}
+
+.upgrade-item.legendary {
+    --upgrade-color: #FFD700;
+}
+
+.upgrade-rarity {
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+    color: var(--upgrade-color, #808080);
+}
+
+.upgrade-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+    line-height: 1.1;
+}
+
+.upgrade-description {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.2;
+}
+
+.no-upgrades {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+    font-style: italic;
+    padding: 20px 10px;
+}
+
+
+/* Responsive design for upgrades display */
+@media (max-width: 768px) {
+    .upgrades-display {
+        width: calc(100vw - 20px);
+        right: 10px;
+        left: 10px;
+        bottom: 10px;
+        max-height: 150px;
+    }
+    
+    .upgrades-header {
+        padding: 8px 10px;
+    }
+    
+    .upgrades-header h2 {
+        font-size: 12px;
+    }
+    
+    .upgrades-list {
+        padding: 6px 10px;
+        max-height: calc(150px - 40px);
+    }
+    
+    .upgrade-item {
+        padding: 6px 8px;
+        margin-bottom: 4px;
+    }
+    
+    .upgrade-name {
+        font-size: 10px;
+    }
+    
+    .upgrade-description {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 480px) {
+    .upgrades-display {
+        width: calc(100vw - 10px);
+        right: 5px;
+        left: 5px;
+        bottom: 5px;
+        max-height: 120px;
+    }
+    
+    .upgrades-header {
+        padding: 6px 8px;
+    }
+    
+    .upgrades-header h2 {
+        font-size: 11px;
+    }
+    
+    .upgrades-list {
+        padding: 4px 8px;
+        max-height: calc(120px - 35px);
+    }
+    
+    .upgrade-item {
+        padding: 4px 6px;
+        margin-bottom: 3px;
+    }
+    
+    .upgrade-name {
+        font-size: 9px;
+    }
+    
+    .upgrade-description {
+        font-size: 8px;
+    }
+}
+
 /* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
     .stat:hover::before,
@@ -1807,5 +2025,17 @@ body::before {
     
     .enemy:hover::before {
         display: none;
+    }
+    
+    .upgrade-item:hover {
+        transform: none;
+    }
+    
+    .upgrades-toggle:hover {
+        transform: translateY(-50%) scale(1);
+    }
+    
+    .upgrades-toggle:active {
+        transform: translateY(-50%) scale(0.95);
     }
 }
