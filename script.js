@@ -567,6 +567,7 @@ class TypeSlopGame {
             console.error('Start button not found!');
         }
         document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
+        document.getElementById('main-menu-btn').addEventListener('click', () => this.returnToMainMenu());
         this.typingInput.addEventListener('input', (e) => this.handleTyping(e));
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         
@@ -664,6 +665,13 @@ class TypeSlopGame {
         this.gameOverScreen.classList.add('hidden');
         this.typingInput.value = '';
         this.startGame();
+        this.typingInput.focus();
+    }
+
+    returnToMainMenu() {
+        this.gameOverScreen.classList.add('hidden');
+        this.startScreen.classList.remove('hidden');
+        this.typingInput.value = '';
         this.typingInput.focus();
     }
 

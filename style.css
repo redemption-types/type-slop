@@ -1269,31 +1269,142 @@ body::before {
     }
 }
 
-#game-over-screen h2 {
-    font-size: clamp(36px, 6vw, 56px);
-    margin-bottom: clamp(15px, 3vh, 25px);
-    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+.game-over-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: game-over-fade-in 0.8s ease-out;
+}
+
+@keyframes game-over-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.game-over-logo {
+    max-width: clamp(300px, 60vw, 500px);
+    max-height: clamp(150px, 25vh, 250px);
+    width: 125%;
+    height: auto;
+    margin-bottom: clamp(20px, 4vh, 30px);
+    animation: game-over-logo-pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.6));
+}
+
+@keyframes game-over-logo-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.6));
+    }
+    50% { 
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.8));
+    }
+}
+
+.game-over-stats {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: clamp(15px, 3vh, 25px);
+    margin-bottom: clamp(25px, 5vh, 35px);
+    backdrop-filter: blur(15px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    min-width: clamp(200px, 40vw, 300px);
+}
+
+.game-over-stats p {
+    margin: clamp(6px, 1.5vh, 10px) 0;
+    font-size: clamp(16px, 3vw, 20px);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.game-over-stats p:first-child {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-shadow: none;
-    animation: game-over-shake 0.5s ease-in-out;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }
 
-@keyframes game-over-shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+.game-over-stats p:last-child {
+    background: linear-gradient(135deg, #4ECDC4, #44A3AA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px rgba(78, 205, 196, 0.5));
 }
 
-#game-over-screen p {
-    margin: clamp(8px, 2vh, 15px) 0;
+.game-over-options {
+    display: flex;
+    gap: clamp(15px, 3vw, 25px);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.game-over-btn {
+    padding: clamp(12px, 2.5vh, 18px) clamp(25px, 5vw, 35px);
     font-size: clamp(16px, 3vw, 20px);
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.025em;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px) saturate(180%);
+    min-width: clamp(120px, 25vw, 180px);
+}
+
+.game-over-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.game-over-btn:hover::before {
+    left: 100%;
+}
+
+.restart-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+}
+
+.restart-btn:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #ff6b6b 100%);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 30px rgba(255, 107, 107, 0.4);
+}
+
+.main-menu-btn {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.main-menu-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
 }
 
 #start-btn {

@@ -76,10 +76,17 @@
 
         <!-- Game Over Screen -->
         <section id="game-over-screen" class="hidden" role="dialog" aria-labelledby="game-over-title" aria-modal="true">
-            <h2 id="game-over-title">Game Over</h2>
-            <p>Final Score: <span id="final-score">0</span></p>
-            <p>Waves Survived: <span id="final-wave">0</span></p>
-            <button id="restart-btn" aria-label="Start a new game">Play Again</button>
+            <div class="game-over-content">
+                <img src="game-over.png" alt="GAME OVER" class="game-over-logo" id="game-over-title">
+                <div class="game-over-stats">
+                    <p>Final Score: <span id="final-score">0</span></p>
+                    <p>Waves Survived: <span id="final-wave">0</span></p>
+                </div>
+                <div class="game-over-options">
+                    <button id="restart-btn" class="game-over-btn restart-btn" aria-label="Restart the game">Restart?</button>
+                    <button id="main-menu-btn" class="game-over-btn main-menu-btn" aria-label="Return to main menu">Main Menu</button>
+                </div>
+            </div>
         </section>
 
         <!-- Start Screen -->
