@@ -409,6 +409,9 @@ class TypeSlopGame {
         const destroyed = enemy.takeDamage(damage);
         
         if (destroyed) {
+            // Show word explosion effect
+            this.showWordExplosion(enemy);
+            
             // Remove enemy
             this.gameState.enemies = this.gameState.enemies.filter(e => e.id !== enemy.id);
             enemy.element.remove();
@@ -518,6 +521,48 @@ class TypeSlopGame {
         
         this.enemiesContainer.appendChild(popup);
         setTimeout(() => popup.remove(), 1500);
+    }
+
+    showWordExplosion(enemy) {
+        // Create explosion container
+        const explosion = document.createElement('div');
+        explosion.className = 'word-explosion';
+        explosion.style.left = `${enemy.x + enemy.element.offsetWidth / 2}px`;
+        explosion.style.top = `${enemy.y + enemy.element.offsetHeight / 2}px`;
+        
+        // Create alien image that appears first
+        const alienImage = document.createElement('div');
+        alienImage.className = 'alien-image';
+        explosion.appendChild(alienImage);
+        
+        // Create the word text that explodes (delayed)
+        const wordText = document.createElement('div');
+        wordText.className = 'word-explosion-text';
+        wordText.textContent = enemy.word;
+        explosion.appendChild(wordText);
+        
+        // Create white particles (delayed)
+        const particleCount = 12;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            // Random direction for each particle
+            const angle = (Math.PI * 2 * i) / particleCount;
+            const distance = 50 + Math.random() * 50; // 50-100px
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            explosion.appendChild(particle);
+        }
+        
+        this.enemiesContainer.appendChild(explosion);
+        
+        // Remove explosion after animation
+        setTimeout(() => explosion.remove(), 2300);
     }
 
     handleKeyDown(e) {

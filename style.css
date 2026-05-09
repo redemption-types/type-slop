@@ -541,3 +541,86 @@ button:hover {
         transform: translateY(-40px) scale(0.8);
     }
 }
+
+/* Word explosion effect */
+.word-explosion {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.alien-image {
+    width: 90px;
+    height: 90px;
+    background-image: url('Copilot_20260508_215208.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: alien-appear-fade 1.5s ease-out forwards;
+    filter: brightness(1);
+}
+
+@keyframes alien-appear-fade {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+}
+
+.word-explosion-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    animation: word-explode-fade 0.5s ease-out forwards;
+    animation-delay: 1.5s;
+}
+
+@keyframes word-explode-fade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        color: #fff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2);
+        color: #fff;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    }
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particle-burst 0.8s ease-out forwards;
+    animation-delay: 1.5s;
+}
+
+@keyframes particle-burst {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+        background: #fff;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.2);
+        background: #fff;
+        box-shadow: 0 0 4px rgba(255, 255, 255, 0.2);
+    }
+}
