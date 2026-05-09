@@ -507,6 +507,7 @@ class TypeSlopGame {
         this.startScreen = document.getElementById('start-screen');
         this.upgradeScreen = document.getElementById('upgrade-screen');
         this.gameOverScreen = document.getElementById('game-over-screen');
+        this.screenBackdrop = document.getElementById('screen-backdrop');
         this.enemiesDefeatedDisplay = document.getElementById('enemies-defeated');
         this.enemiesToDefeatDisplay = document.getElementById('enemies-to-defeat');
         
@@ -632,6 +633,7 @@ class TypeSlopGame {
         this.startScreen.classList.add('hidden');
         this.upgradeScreen.classList.add('hidden');
         this.gameOverScreen.classList.add('hidden');
+        this.screenBackdrop.classList.add('hidden');
         
         // Clear any existing enemies and power-ups
         this.enemiesContainer.innerHTML = '';
@@ -663,6 +665,7 @@ class TypeSlopGame {
 
     restartGame() {
         this.gameOverScreen.classList.add('hidden');
+        this.screenBackdrop.classList.add('hidden');
         this.typingInput.value = '';
         this.startGame();
         this.typingInput.focus();
@@ -670,6 +673,7 @@ class TypeSlopGame {
 
     returnToMainMenu() {
         this.gameOverScreen.classList.add('hidden');
+        this.screenBackdrop.classList.add('hidden');
         this.startScreen.classList.remove('hidden');
         this.typingInput.value = '';
         this.typingInput.focus();
@@ -1203,37 +1207,58 @@ class TypeSlopGame {
     showUpgradeScreen() {
         console.log('=== SHOW UPGRADE SCREEN CALLED ===');
         
+        // Pause game
+        this.gameState.gameRunning = false;
+        
         // Clear typing input
         this.typingInput.value = '';
         
-        // Update upgrade wave counter with color (wave already incremented)
-        this.upgradeWaveCounter.textContent = `lasted ${this.gameState.wave - 1} waves`;
-        this.upgradeWaveCounter.style.color = this.waveColors[(this.gameState.wave - 1) % this.waveColors.length];
+        // Update wave counter
+        document.getElementById('upgrade-wave-counter').textContent = `Completed Wave ${this.gameState.wave}`;
         
         // Reset lootbox UI
         this.resetLootboxUI();
         
-        // Add event listener to lootbox
+        // Get lootbox element
         const lootboxElement = document.getElementById('lootbox');
+        const lootboxImage = document.getElementById('lootbox-image');
+        
+        // Reset lootbox image
+        if (lootboxImage) {
+            lootboxImage.src = 'lootbox-close-state.png';
+        }
+        
+        // Remove opening classes
+        lootboxElement.classList.remove('opening', 'opened');
+        
+        // Add click listener for opening
         lootboxElement.addEventListener('click', () => this.openLootbox(), { once: true });
         
         console.log('Removing hidden class from upgrade screen');
         this.upgradeScreen.classList.remove('hidden');
+        this.screenBackdrop.classList.remove('hidden');
     }
 
     resetLootboxUI() {
-        // Hide animation container and result
-        const animationContainer = document.getElementById('lootbox-animation-container');
         const result = document.getElementById('lootbox-result');
         const lootboxElement = document.getElementById('lootbox');
+        const animationContainer = document.getElementById('lootbox-animation-container');
         
-        animationContainer.style.display = 'none';
-        result.style.display = 'none';
-        lootboxElement.classList.remove('opening');
+        if (animationContainer) {
+            animationContainer.style.display = 'none';
+        }
+        if (result) {
+            result.style.display = 'none';
+        }
+        if (lootboxElement) {
+            lootboxElement.classList.remove('opening');
+        }
         
         // Clear animation content
         const animation = document.getElementById('lootbox-animation');
-        animation.innerHTML = '';
+        if (animation) {
+            animation.innerHTML = '';
+        }
         
         // Reset lootbox image to closed state
         const lootboxImage = document.getElementById('lootbox-image');
@@ -1362,8 +1387,9 @@ class TypeSlopGame {
             // Update upgrades display
             this.updateUpgradesDisplay();
             
-            // Hide upgrade screen
+            // Hide upgrade screen and backdrop
             this.upgradeScreen.classList.add('hidden');
+            this.screenBackdrop.classList.add('hidden');
             
             // Resume game
             this.gameState.gameRunning = true;
@@ -1386,6 +1412,7 @@ class TypeSlopGame {
         document.getElementById('final-score').textContent = this.gameState.score;
         document.getElementById('final-wave').textContent = this.gameState.wave;
         this.gameOverScreen.classList.remove('hidden');
+        this.screenBackdrop.classList.remove('hidden');
     }
 
     updateUI() {

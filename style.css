@@ -538,7 +538,68 @@ body::before {
     display: none !important;
 }
 
-#start-screen, #upgrade-screen, #game-over-screen {
+#upgrade-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(600px, 90vw);
+    max-height: min(700px, 85vh);
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 3000;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    padding: 30px;
+    overflow-y: auto;
+}
+
+#game-over-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(400px, 80vw);
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 100, 100, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    padding: 40px;
+}
+
+#upgrade-screen.hidden, #game-over-screen.hidden {
+    display: none !important;
+}
+
+/* Backdrop overlay for screens */
+.screen-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2999;
+    backdrop-filter: blur(5px);
+}
+
+.screen-backdrop.hidden {
+    display: none !important;
+}
+
+/* Keep start screen full-screen */
+#start-screen {
     position: fixed;
     top: 0;
     left: 0;
@@ -553,7 +614,7 @@ body::before {
     z-index: 3000;
 }
 
-#start-screen.hidden, #upgrade-screen.hidden, #game-over-screen.hidden {
+#start-screen.hidden {
     display: none !important;
 }
 
@@ -772,16 +833,76 @@ body::before {
 }
 
 
-#upgrade-screen h2 {
-    font-size: clamp(28px, 5vw, 40px);
-    margin-bottom: clamp(15px, 3vh, 25px);
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-shadow: none;
+.game-over-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+}
+
+.game-over-logo {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.game-over-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game-over-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.game-over-btn {
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px) saturate(180%);
+    letter-spacing: 0.025em;
+}
+
+.game-over-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+}
+
+.restart-btn {
+    background: linear-gradient(135deg, var(--success), #22c55e);
+    border-color: var(--success);
+}
+
+.restart-btn:hover {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: #22c55e;
+}
+
+.main-menu-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    border-color: var(--accent-primary);
+}
+
+.main-menu-btn:hover {
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
+    border-color: var(--accent-secondary);
 }
 
 /* Upgrade Screen Header */

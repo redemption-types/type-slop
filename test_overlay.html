@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        
+        .game-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .screen-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .screen-backdrop.hidden {
+            display: none !important;
+        }
+        
+        #upgrade-screen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(600px, 90vw);
+            max-height: min(700px, 85vh);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px) saturate(180%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            z-index: 3000;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        #upgrade-screen.hidden {
+            display: none !important;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-content">
+        <h1>Game Content</h1>
+        <p>This represents the game area that should remain visible when overlay appears.</p>
+        <button onclick="showOverlay()">Show Upgrade Overlay</button>
+        <button onclick="hideOverlay()">Hide Overlay</button>
+    </div>
+    
+    <div id="screen-backdrop" class="screen-backdrop hidden"></div>
+    
+    <section id="upgrade-screen" class="hidden">
+        <h2>Upgrade Screen Test</h2>
+        <p>This should appear as a centered overlay with backdrop.</p>
+        <button onclick="hideOverlay()">Close</button>
+    </section>
+    
+    <script>
+        function showOverlay() {
+            document.getElementById('upgrade-screen').classList.remove('hidden');
+            document.getElementById('screen-backdrop').classList.remove('hidden');
+            console.log('Showing overlay');
+        }
+        
+        function hideOverlay() {
+            document.getElementById('upgrade-screen').classList.add('hidden');
+            document.getElementById('screen-backdrop').classList.add('hidden');
+            console.log('Hiding overlay');
+        }
+    </script>
+</body>
+</html>
