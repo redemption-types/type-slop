@@ -488,6 +488,18 @@ class TypeSlopGame {
         this.enemiesContainer.appendChild(element);
     }
 
+    showLoseLifeImage(x, y) {
+        const loseLifeImage = document.createElement('div');
+        loseLifeImage.className = 'lose-life-image';
+        loseLifeImage.style.left = `${x}px`;
+        loseLifeImage.style.top = `${y}px`;
+        
+        this.enemiesContainer.appendChild(loseLifeImage);
+        
+        // Remove after animation
+        setTimeout(() => loseLifeImage.remove(), 2000);
+    }
+
     showComboPopup(x, y, combo) {
         const popup = document.createElement('div');
         popup.className = 'combo-popup';
@@ -652,6 +664,10 @@ class TypeSlopGame {
         enemy.element.remove();
         this.gameState.lives--;
         this.gameState.combo = 0;
+        
+        // Show lose life image
+        this.showLoseLifeImage(enemy.x, enemy.y);
+        
         this.updateUI();
         
         if (this.gameState.lives <= 0) {

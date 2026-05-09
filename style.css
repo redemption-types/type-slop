@@ -403,16 +403,30 @@ body::before {
 }
 
 #start-screen h1 {
-    font-size: clamp(32px, 6vw, 64px);
-    margin-bottom: clamp(15px, 3vh, 30px);
+    font-size: clamp(28px, 5vw, 48px);
+    margin-bottom: clamp(12px, 2.5vh, 20px);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: none;
+    color: #667eea; /* Fallback color */
+    text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
     font-weight: 800;
     letter-spacing: 2px;
     animation: title-pulse 3s ease-in-out infinite;
+    text-align: center;
+    line-height: 1.2;
+    position: relative;
+    z-index: 5;
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (-webkit-background-clip: text) {
+    #start-screen h1 {
+        background: none;
+        color: #667eea;
+        text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+    }
 }
 
 @keyframes title-pulse {
@@ -421,25 +435,25 @@ body::before {
 }
 
 #start-screen p {
-    margin: clamp(8px, 1.5vh, 15px) 0;
-    font-size: clamp(14px, 2.5vw, 18px);
+    margin: clamp(6px, 1.2vh, 12px) 0;
+    font-size: clamp(12px, 2.2vw, 16px);
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     letter-spacing: 0.5px;
 }
 
 .game-rules {
-    margin: clamp(20px, 4vh, 40px) 0;
+    margin: clamp(15px, 3vh, 30px) 0;
     text-align: left;
     max-width: clamp(350px, 70vw, 600px);
     background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(30, 30, 50, 0.9) 100%);
-    padding: clamp(15px, 3vh, 30px);
+    padding: clamp(12px, 2.5vh, 20px);
     border-radius: 15px;
     border: 2px solid rgba(100, 100, 255, 0.3);
-    max-height: clamp(300px, 50vh, 500px);
-    overflow-y: auto;
+    overflow: visible;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-height: none;
 }
 
 .game-rules h3 {
@@ -447,8 +461,8 @@ body::before {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: clamp(8px, 1.5vh, 15px);
-    font-size: clamp(16px, 3.5vw, 20px);
+    margin-bottom: clamp(6px, 1.2vh, 10px);
+    font-size: clamp(14px, 3vw, 18px);
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -456,19 +470,16 @@ body::before {
 .game-rules ul {
     list-style: none;
     padding: 0;
-    margin-bottom: clamp(10px, 2vh, 20px);
-list-style: none;
-padding: 0;
-margin-bottom: clamp(10px, 2vh, 20px);
+    margin-bottom: clamp(6px, 1.2vh, 10px);
 }
 
 .game-rules li {
-    margin: clamp(6px, 1.2vh, 12px) 0;
+    margin: clamp(3px, 0.8vh, 6px) 0;
     padding-left: 25px;
     position: relative;
-    font-size: clamp(12px, 2.5vw, 15px);
+    font-size: clamp(10px, 2vw, 12px);
     color: rgba(255, 255, 255, 0.85);
-    line-height: 1.6;
+    line-height: 1.3;
 }
 
 .game-rules li::before {
@@ -486,31 +497,32 @@ margin-bottom: clamp(10px, 2vh, 20px);
 .powerup-legend {
     display: flex;
     flex-direction: column;
-    gap: clamp(5px, 1vh, 10px);
+    gap: clamp(3px, 0.8vh, 6px);
 }
 
 .powerup-item {
     display: flex;
     align-items: center;
-    gap: clamp(10px, 2vw, 15px);
-    padding: clamp(5px, 1vh, 8px);
+    gap: clamp(6px, 1.5vw, 10px);
+    padding: clamp(3px, 0.8vh, 5px);
     background: rgba(0,0,0,0.2);
     border-radius: 6px;
 }
 
 .powerup-emoji {
-    font-size: clamp(16px, 3vw, 24px);
-    width: clamp(20px, 4vw, 30px);
+    font-size: clamp(12px, 2.2vw, 18px);
+    width: clamp(14px, 2.5vw, 20px);
     text-align: center;
 }
 
 .powerup-desc {
     color: #fff;
-    font-size: clamp(10px, 2vw, 14px);
+    font-size: clamp(8px, 1.6vw, 11px);
+    line-height: 1.2;
 }
 
 .difficulty-selection {
-    margin: clamp(15px, 3vh, 30px) 0;
+    margin: clamp(12px, 2.5vh, 20px) 0;
 }
 
 .difficulty-selection h3 {
@@ -518,8 +530,8 @@ margin-bottom: clamp(10px, 2vh, 20px);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: clamp(10px, 2vh, 20px);
-    font-size: clamp(16px, 3.5vw, 20px);
+    margin-bottom: clamp(8px, 1.5vh, 12px);
+    font-size: clamp(14px, 3vw, 18px);
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -691,24 +703,30 @@ margin-bottom: clamp(10px, 2vh, 20px);
     letter-spacing: 0.5px;
 }
 
-button {
+#start-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    padding: clamp(12px, 2.5vh, 16px) clamp(24px, 5vw, 32px);
-    font-size: clamp(16px, 3vw, 20px);
+    padding: clamp(10px, 2vh, 14px) clamp(20px, 4vw, 28px);
+    font-size: clamp(14px, 2.5vw, 18px);
     font-weight: 700;
     border-radius: 12px;
     cursor: pointer;
-    margin-top: clamp(20px, 4vh, 30px);
+    margin-top: clamp(15px, 3vh, 20px);
     transition: all 0.3s ease;
     letter-spacing: 1px;
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     position: relative;
     overflow: hidden;
+    z-index: 10;
+    min-height: 45px;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-button::before {
+#start-btn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -719,11 +737,11 @@ button::before {
     transition: left 0.5s ease;
 }
 
-button:hover::before {
+#start-btn:hover::before {
     left: 100%;
 }
 
-button:hover {
+#start-btn:hover {
     background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
@@ -863,6 +881,35 @@ button:hover {
     100% {
         opacity: 0;
         transform: translateY(-60px) scale(0.8) rotate(360deg);
+    }
+}
+
+/* Lose life image effect */
+.lose-life-image {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-image: url('lose-life.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: lose-life-fade 2s ease-out forwards;
+    z-index: 999;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8));
+}
+
+@keyframes lose-life-fade {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(0deg);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(1.2) rotate(90deg);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) rotate(360deg) translateY(-50px);
     }
 }
 
