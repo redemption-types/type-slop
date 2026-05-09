@@ -421,14 +421,15 @@ body::before {
 }
 
 .title-logo {
-    max-width: clamp(300px, 50vw, 600px);
-    max-height: clamp(120px, 20vh, 240px);
-    width: auto;
+    max-width: clamp(400px, 60vw, 800px);
+    max-height: clamp(160px, 25vh, 320px);
+    width: 100%;
     height: auto;
     margin-bottom: clamp(12px, 2.5vh, 20px);
     animation: title-pulse 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.8));
+    filter: drop-shadow(0 0 40px rgba(102, 126, 234, 1));
     transition: all 0.3s ease;
+    object-fit: contain;
 }
 
 .title-logo:hover {
@@ -781,14 +782,15 @@ body::before {
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(20, 20, 40, 0.8);
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 215, 0, 0.3);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
 }
 
 .csgo-marker {
     position: absolute;
-    top: 50%;
+    top: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
