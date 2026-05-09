@@ -572,6 +572,29 @@ class TypeSlopGame {
             explosion.appendChild(particle);
         }
         
+        // Create additional dramatic white particle explosion
+        const whiteParticleCount = 20;
+        for (let i = 0; i < whiteParticleCount; i++) {
+            const whiteParticle = document.createElement('div');
+            whiteParticle.className = 'white-particle';
+            
+            // More explosive and random directions
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 80 + Math.random() * 120; // 80-200px for more dramatic effect
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            whiteParticle.style.setProperty('--tx', `${tx}px`);
+            whiteParticle.style.setProperty('--ty', `${ty}px`);
+            
+            // Random size variation for more dynamic effect
+            const size = 4 + Math.random() * 8; // 4-12px
+            whiteParticle.style.width = `${size}px`;
+            whiteParticle.style.height = `${size}px`;
+            
+            explosion.appendChild(whiteParticle);
+        }
+        
         this.enemiesContainer.appendChild(explosion);
         
         // Remove explosion after animation
