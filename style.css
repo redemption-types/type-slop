@@ -544,7 +544,7 @@ body::before {
     left: 50%;
     transform: translate(-50%, -50%);
     width: min(550px, 85vw);
-    height: min(650px, 80vh);
+    height: min(850px, 90vh);
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px) saturate(180%);
     display: flex;
@@ -1398,23 +1398,23 @@ body::before {
 }
 
 .lootbox-result h3 {
-    font-size: clamp(20px, 4vw, 28px);
-    margin-bottom: 15px;
+    font-size: clamp(16px, 3vw, 20px);
+    margin-bottom: 10px;
     color: #FFD700;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .result-card {
-    width: clamp(220px, 40vw, 280px);
-    height: clamp(160px, 25vh, 200px);
+    width: clamp(180px, 35vw, 220px);
+    height: clamp(120px, 18vh, 160px);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
     border: 3px solid #FFD700;
-    border-radius: 20px;
-    padding: 20px;
-    margin: 0 auto 20px;
+    border-radius: 16px;
+    padding: 15px;
+    margin: 0 auto 15px;
     text-align: center;
     backdrop-filter: blur(15px);
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
     animation: result-glow 2s ease-in-out infinite;
 }
 
@@ -1426,9 +1426,9 @@ body::before {
 .continue-button {
     background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%);
     border: none;
-    border-radius: 25px;
-    padding: clamp(10px, 2vh, 15px) clamp(25px, 5vw, 35px);
-    font-size: clamp(14px, 3vw, 18px);
+    border-radius: 20px;
+    padding: clamp(8px, 2vh, 12px) clamp(20px, 5vw, 25px);
+    font-size: clamp(12px, 2.5vw, 16px);
     font-weight: bold;
     color: white;
     cursor: pointer;
