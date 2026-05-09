@@ -200,6 +200,7 @@ class TypeSlopGame {
         this.comboDisplay = document.getElementById('combo');
         this.slowmoFill = document.getElementById('slowmo-fill');
         this.waveCounter = document.getElementById('wave-counter');
+        this.upgradeWaveCounter = document.getElementById('upgrade-wave-counter');
         this.startScreen = document.getElementById('start-screen');
         this.upgradeScreen = document.getElementById('upgrade-screen');
         this.gameOverScreen = document.getElementById('game-over-screen');
@@ -716,6 +717,9 @@ class TypeSlopGame {
         console.log('Setting game running to false');
         this.gameState.gameRunning = false;
         
+        // Increment wave count when wave is completed
+        this.gameState.wave++;
+        
         // Apply difficulty scaling
         this.gameState.enemySpeedMultiplier *= 1.03;
         this.gameState.spawnDelayMultiplier *= 0.98;
@@ -730,6 +734,10 @@ class TypeSlopGame {
         
         // Clear typing input
         this.typingInput.value = '';
+        
+        // Update upgrade wave counter with color (wave already incremented)
+        this.upgradeWaveCounter.textContent = `lasted ${this.gameState.wave - 1} waves`;
+        this.upgradeWaveCounter.style.color = this.waveColors[(this.gameState.wave - 1) % this.waveColors.length];
         
         const upgradeOptions = document.getElementById('upgrade-options');
         upgradeOptions.innerHTML = '';
@@ -754,14 +762,9 @@ class TypeSlopGame {
             `;
             option.addEventListener('click', () => {
                 console.log('Upgrade clicked:', upgrade.name);
-                console.log('Wave before increment:', this.gameState.wave);
                 
                 // Apply upgrade effect
                 upgrade.apply(this.gameState);
-                
-                // Increment wave
-                this.gameState.wave++;
-                console.log('Wave after increment:', this.gameState.wave);
                 
                 // Hide upgrade screen
                 this.upgradeScreen.classList.add('hidden');
