@@ -45,6 +45,8 @@ class GameState {
         this.waveCompleted = false;
         this.waveEnemiesSpawned = false;
         this.firstEnemySpawned = false;
+        this.enemiesDefeated = 0;
+        this.totalEnemiesInWave = 0;
     }
 }
 
@@ -505,6 +507,8 @@ class TypeSlopGame {
         this.startScreen = document.getElementById('start-screen');
         this.upgradeScreen = document.getElementById('upgrade-screen');
         this.gameOverScreen = document.getElementById('game-over-screen');
+        this.enemiesDefeatedDisplay = document.getElementById('enemies-defeated');
+        this.enemiesToDefeatDisplay = document.getElementById('enemies-to-defeat');
         
         this.lastSpawnTime = 0;
         this.spawnInterval = 2000; // Base spawn interval
@@ -527,26 +531,70 @@ class TypeSlopGame {
     }
 
     selectDifficulty(difficulty) {
+        console.log('selectDifficulty called with:', difficulty);
         this.currentDifficulty = difficulty;
         this.difficultySettings = DIFFICULTY_SETTINGS[difficulty];
         
         // Update button states
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.classList.remove('active');
+            btn.setAttribute('aria-checked', 'false');
         });
-        document.querySelector(`[data-difficulty="${difficulty}"]`).classList.add('active');
+        
+        const selectedBtn = document.querySelector(`[data-difficulty="${difficulty}"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('active');
+            selectedBtn.setAttribute('aria-checked', 'true');
+            console.log('Difficulty set to:', difficulty, 'Settings:', this.difficultySettings);
+        } else {
+            console.error('Could not find button for difficulty:', difficulty);
+        }
     }
 
     init() {
         // Event listeners
-        document.getElementById('start-btn').addEventListener('click', () => this.startGame());
+        const startBtn = document.getElementById('start-btn');
+        console.log('Start button found:', startBtn);
+        if (startBtn) {
+            startBtn.addEventListener('click', (e) => {
+                console.log('=== START BUTTON CLICKED ===');
+                console.log('Current difficulty before start:', this.currentDifficulty);
+                console.log('Difficulty settings before start:', this.difficultySettings);
+                e.preventDefault();
+                this.startGame();
+            });
+        } else {
+            console.error('Start button not found!');
+        }
         document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
         this.typingInput.addEventListener('input', (e) => this.handleTyping(e));
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         
-        // Difficulty selection event listeners
-        document.querySelectorAll('.difficulty-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.selectDifficulty(e.target.dataset.difficulty));
+        // Difficulty selection event listeners - using event delegation
+        document.addEventListener('click', (e) => {
+            console.log('Document click detected, target:', e.target);
+            console.log('Target classes:', e.target.className);
+            
+            // Check if clicked element or its parent has difficulty-btn class
+            const clickedBtn = e.target.closest('.difficulty-btn');
+            if (clickedBtn) {
+                console.log('=== DIFFICULTY BUTTON CLICKED ===');
+                console.log('Clicked button:', clickedBtn);
+                console.log('Button dataset:', clickedBtn.dataset);
+                
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const difficulty = clickedBtn.dataset.difficulty;
+                console.log('Difficulty extracted:', difficulty);
+                
+                if (difficulty) {
+                    console.log('Calling selectDifficulty with:', difficulty);
+                    this.selectDifficulty(difficulty);
+                } else {
+                    console.error('No difficulty found on clicked element');
+                }
+            }
         });
         
         // Focus input on load
@@ -554,10 +602,25 @@ class TypeSlopGame {
         
         // Set global reference for enemy speed calculations
         window.game = this;
+        
+        // Debug: Test difficulty buttons manually
+        console.log('=== DEBUGGING DIFFICULTY BUTTONS ===');
+        console.log('Found difficulty buttons:', document.querySelectorAll('.difficulty-btn'));
+        document.querySelectorAll('.difficulty-btn').forEach((btn, index) => {
+            console.log(`Button ${index}:`, btn, 'Dataset:', btn.dataset);
+        });
+        
+        // Test manual difficulty setting
+        window.testDifficulty = (diff) => {
+            console.log('Manual test setting difficulty to:', diff);
+            this.selectDifficulty(diff);
+        };
     }
 
     startGame() {
         console.log('=== START GAME CALLED ===');
+        console.log('Current difficulty:', this.currentDifficulty);
+        console.log('Difficulty settings:', this.difficultySettings);
         console.log('Current enemies:', this.gameState.enemies.length);
         console.log('Game running:', this.gameState.gameRunning);
         
@@ -577,6 +640,10 @@ class TypeSlopGame {
         
         console.log('After reset - enemies:', this.gameState.enemies.length);
         console.log('After reset - game running:', this.gameState.gameRunning);
+        console.log('Applied difficulty settings:', {
+            enemySpeedMultiplier: this.gameState.enemySpeedMultiplier,
+            spawnDelayMultiplier: this.gameState.spawnDelayMultiplier
+        });
         
         // Clear any timeouts
         if (this.slowMoTimeout) clearTimeout(this.slowMoTimeout);
@@ -602,9 +669,12 @@ class TypeSlopGame {
         this.gameState.waveCompleted = false;
         this.gameState.waveEnemiesSpawned = false;
         this.gameState.firstEnemySpawned = false;
+        this.gameState.enemiesDefeated = 0;
         
         const enemyCount = 5 + this.gameState.wave;
+        this.gameState.totalEnemiesInWave = enemyCount;
         this.spawnWaveEnemies(enemyCount);
+        this.updateEnemyDefeatedDisplay();
     }
 
     spawnWaveEnemies(count) {
@@ -725,6 +795,10 @@ class TypeSlopGame {
             // Update score and combo
             this.gameState.score += 10 * (this.gameState.combo + 1);
             this.gameState.combo++;
+            
+            // Increment enemies defeated counter
+            this.gameState.enemiesDefeated++;
+            this.updateEnemyDefeatedDisplay();
             
             // Show combo popup
             if (this.gameState.combo > 0 && this.gameState.combo % 5 === 0) {
@@ -1261,9 +1335,18 @@ class TypeSlopGame {
         this.waveCounter.textContent = `lasted ${this.gameState.wave - 1} waves`;
         this.waveCounter.style.color = this.waveColors[(this.gameState.wave - 1) % this.waveColors.length];
     }
+
+    updateEnemyDefeatedDisplay() {
+        this.enemiesDefeatedDisplay.textContent = this.gameState.enemiesDefeated;
+        this.enemiesToDefeatDisplay.textContent = this.gameState.totalEnemiesInWave;
+    }
 }
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new TypeSlopGame();
+    const game = new TypeSlopGame();
+    // Make game instance globally accessible for debugging
+    window.gameInstance = game;
+    console.log('Game initialized:', game);
+    console.log('testDifficulty function available:', typeof window.testDifficulty);
 });

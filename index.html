@@ -9,36 +9,37 @@
 <body>
     <div id="game-container">
         <!-- Top Bar -->
-        <div id="top-bar">
-            <div class="stat">Wave: <span id="wave">1</span></div>
-            <div class="stat">Lives: <span id="lives">3</span></div>
-            <div class="stat">Score: <span id="score">0</span></div>
-            <div class="stat">Combo: <span id="combo">0</span></div>
-            <div class="stat" id="wave-counter">lasted 0 waves</div>
+        <header id="top-bar" role="banner">
+            <div class="stat" aria-label="Current wave number">Wave: <span id="wave">1</span></div>
+            <div class="stat" aria-label="Player lives remaining">Lives: <span id="lives">3</span></div>
+            <div class="stat" aria-label="Current score">Score: <span id="score">0</span></div>
+            <div class="stat" aria-label="Current combo count">Combo: <span id="combo">0</span></div>
+            <div class="stat" aria-label="Enemies defeated this wave">Enemies Defeated: <span id="enemies-defeated">0</span>/<span id="enemies-to-defeat">0</span></div>
+            <div class="stat" id="wave-counter" aria-live="polite" aria-atomic="true">lasted 0 waves</div>
             <div class="slowmo-container">
                 <div class="slowmo-title">SLO MO</div>
-                <div id="slowmo-bar">
+                <div id="slowmo-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-label="Slow-motion ability cooldown">
                     <div id="slowmo-fill"></div>
                     <span id="slowmo-text">SPACE</span>
                 </div>
             </div>
-        </div>
+        </header>
 
         <!-- Game Area -->
-        <div id="game-area">
-            <div id="enemies-container"></div>
-            <div id="player-line"></div>
-        </div>
+        <main id="game-area" role="main" aria-label="Game play area">
+            <div id="enemies-container" aria-live="polite" aria-atomic="false"></div>
+            <div id="player-line" aria-hidden="true"></div>
+        </main>
 
         <!-- Input Area -->
-        <div id="input-area">
-            <input type="text" id="typing-input" placeholder="Type words here..." autocomplete="off">
-        </div>
+        <footer id="input-area" role="contentinfo">
+            <input type="text" id="typing-input" placeholder="Type words here..." autocomplete="off" aria-label="Type words to destroy enemies" spellcheck="false">
+        </footer>
 
         <!-- Upgrade Screen -->
-        <div id="upgrade-screen" class="hidden">
-            <h2>🎁 LOOTBOX UNBOXING 🎁</h2>
-            <div class="upgrade-wave-counter" id="upgrade-wave-counter">lasted 0 waves</div>
+        <section id="upgrade-screen" class="hidden" role="dialog" aria-labelledby="upgrade-title" aria-modal="true">
+            <h2 id="upgrade-title">🎁 LOOTBOX UNBOXING 🎁</h2>
+            <div class="upgrade-wave-counter" id="upgrade-wave-counter" aria-live="polite">lasted 0 waves</div>
             
             <div class="lootbox-container">
                 <div class="lootbox" id="lootbox">
@@ -55,31 +56,31 @@
                 <div class="lootbox-result" id="lootbox-result" style="display: none;">
                     <h3>You Got:</h3>
                     <div class="result-card" id="result-card"></div>
-                    <button id="continue-btn" class="continue-button">Continue</button>
+                    <button id="continue-btn" class="continue-button" aria-label="Continue to next wave">Continue</button>
                 </div>
             </div>
         </div>
 
         <!-- Game Over Screen -->
-        <div id="game-over-screen" class="hidden">
-            <h2>Game Over</h2>
+        <section id="game-over-screen" class="hidden" role="dialog" aria-labelledby="game-over-title" aria-modal="true">
+            <h2 id="game-over-title">Game Over</h2>
             <p>Final Score: <span id="final-score">0</span></p>
             <p>Waves Survived: <span id="final-wave">0</span></p>
-            <button id="restart-btn">Play Again</button>
-        </div>
+            <button id="restart-btn" aria-label="Start a new game">Play Again</button>
+        </section>
 
         <!-- Start Screen -->
-        <div id="start-screen">
-            <img src="type_script_logo.png" alt="Type Script Logo" class="title-logo">
-            <p>A fast-paced typing rogue-like.</p>
+        <section id="start-screen" role="dialog" aria-labelledby="start-title" aria-modal="true">
+            <img src="new_logo.png" alt="Type Script Logo" class="title-logo">
+            <h1 id="start-title">A fast-paced typing rogue-like.</h1>
             <p>Type words to destroy enemies before they reach you!</p>
             
             <div class="difficulty-selection">
                 <h3>Select Difficulty:</h3>
-                <div class="difficulty-options">
-                    <button class="difficulty-btn" data-difficulty="easy">Easy</button>
-                    <button class="difficulty-btn active" data-difficulty="medium">Medium</button>
-                    <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+                <div class="difficulty-options" role="radiogroup" aria-labelledby="difficulty-label">
+                    <button class="difficulty-btn" data-difficulty="easy" role="radio" aria-checked="false" aria-label="Easy difficulty">Easy</button>
+                    <button class="difficulty-btn active" data-difficulty="medium" role="radio" aria-checked="true" aria-label="Medium difficulty">Medium</button>
+                    <button class="difficulty-btn" data-difficulty="hard" role="radio" aria-checked="false" aria-label="Hard difficulty">Hard</button>
                 </div>
             </div>
             
@@ -109,7 +110,7 @@
                 </div>
             </div>
             
-            <button id="start-btn">Start Game</button>
+            <button id="start-btn" aria-label="Start the game">Start Game</button>
         </div>
     </div>
 
