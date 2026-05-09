@@ -676,6 +676,270 @@ body::before {
     margin: 0;
 }
 
+/* Lootbox Styles */
+#upgrade-screen h2 {
+    font-size: clamp(32px, 6vw, 48px);
+    margin-bottom: clamp(15px, 3vh, 25px);
+    background: linear-gradient(45deg, #FFD700, #FF6B6B, #4ECDC4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: none;
+    animation: rainbow-glow 3s ease-in-out infinite;
+}
+
+@keyframes rainbow-glow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+}
+
+.lootbox-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(20px, 4vh, 40px);
+}
+
+.lootbox {
+    width: clamp(100px, 15vw, 140px);
+    height: clamp(100px, 15vw, 140px);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.lootbox:hover {
+    transform: scale(1.1);
+}
+
+.lootbox-body {
+    width: 100%;
+    height: 65%;
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
+    border: 3px solid #FFD700;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+}
+
+.lootbox-lid {
+    width: 90%;
+    height: 25%;
+    background: linear-gradient(135deg, #CD853F 0%, #DEB887 50%, #F4A460 100%);
+    border: 3px solid #FFD700;
+    border-radius: 10px 10px 0 0;
+    position: absolute;
+    top: 0;
+    left: 5%;
+    transform-origin: bottom left;
+    transition: transform 0.5s ease;
+    box-shadow: 0 -3px 10px rgba(255, 215, 0, 0.2);
+}
+
+.lootbox.opening .lootbox-lid {
+    transform: rotate(-45deg);
+}
+
+.lootbox-glow {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, transparent 70%);
+    border-radius: 50%;
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    opacity: 0;
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.lootbox:hover .lootbox-glow {
+    opacity: 1;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 0.3; }
+}
+
+.lootbox-text {
+    font-size: clamp(10px, 2vw, 14px);
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.lootbox-animation-container {
+    width: clamp(300px, 60vw, 500px);
+    height: clamp(150px, 25vh, 250px);
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.lootbox-animation {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lootbox-card {
+    width: clamp(180px, 35vw, 220px);
+    height: clamp(120px, 20vh, 160px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    position: absolute;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.lootbox-card.spinning {
+    animation: card-spin 0.1s linear infinite;
+}
+
+@keyframes card-spin {
+    0% { transform: translateY(0) rotateY(0deg); opacity: 1; }
+    25% { transform: translateY(-20px) rotateY(90deg); opacity: 0.5; }
+    50% { transform: translateY(0) rotateY(180deg); opacity: 1; }
+    75% { transform: translateY(20px) rotateY(270deg); opacity: 0.5; }
+    100% { transform: translateY(0) rotateY(360deg); opacity: 1; }
+}
+
+.lootbox-animation.spinning .lootbox-card {
+    animation: card-spin-fast 0.05s linear infinite;
+}
+
+@keyframes card-spin-fast {
+    0% { transform: translateY(0) rotateY(0deg) scale(0.8); opacity: 0.3; }
+    50% { transform: translateY(-10px) rotateY(180deg) scale(1.1); opacity: 0.8; }
+    100% { transform: translateY(0) rotateY(360deg) scale(0.8); opacity: 0.3; }
+}
+
+.card-rarity {
+    font-size: clamp(12px, 2.5vw, 16px);
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-name {
+    font-size: clamp(14px, 3vw, 18px);
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.card-description {
+    font-size: clamp(10px, 2vw, 13px);
+    color: #ccc;
+    line-height: 1.3;
+}
+
+.lootbox-card.revealed {
+    animation: card-reveal 0.8s ease-out;
+    border-width: 3px;
+    box-shadow: 0 0 30px currentColor;
+}
+
+@keyframes card-reveal {
+    0% { transform: scale(0) rotateY(180deg); opacity: 0; }
+    50% { transform: scale(1.2) rotateY(90deg); opacity: 0.8; }
+    100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+}
+
+.lootbox-result {
+    text-align: center;
+    animation: fade-in 0.5s ease-out;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lootbox-result h3 {
+    font-size: clamp(20px, 4vw, 28px);
+    margin-bottom: 15px;
+    color: #FFD700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.result-card {
+    width: clamp(220px, 40vw, 280px);
+    height: clamp(160px, 25vh, 200px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border: 3px solid #FFD700;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 0 auto 20px;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+    animation: result-glow 2s ease-in-out infinite;
+}
+
+@keyframes result-glow {
+    0%, 100% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.6); }
+}
+
+.continue-button {
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%);
+    border: none;
+    border-radius: 25px;
+    padding: clamp(10px, 2vh, 15px) clamp(25px, 5vw, 35px);
+    font-size: clamp(14px, 3vw, 18px);
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.continue-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+.continue-button:active {
+    transform: translateY(0);
+}
+
+/* Lootbox Particle Effects */
+.lootbox-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particle-explode 1.5s ease-out forwards;
+}
+
+@keyframes particle-explode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
 #game-over-screen h2 {
     font-size: clamp(36px, 6vw, 56px);
     margin-bottom: clamp(15px, 3vh, 25px);

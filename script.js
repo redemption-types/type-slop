@@ -105,32 +105,104 @@ class PowerUp {
     }
 }
 
-// Upgrade definitions
+// Lootbox rarity system
+const RARITY_COLORS = {
+    common: '#808080',      // Gray
+    rare: '#4169E1',        // Royal Blue
+    epic: '#9932CC',        // Dark Orchid
+    legendary: '#FFD700'    // Gold
+};
+
+const RARITY_PROBABILITIES = {
+    common: 0.60,    // 60%
+    rare: 0.25,      // 25%
+    epic: 0.12,      // 12%
+    legendary: 0.03  // 3%
+};
+
+// Upgrade definitions with rarity system
 const UPGRADES = [
+    // Common upgrades (60% chance)
+    {
+        name: '+5% Typing Damage',
+        description: 'Deal more damage to tank enemies',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.typingDamage *= 1.05;
+        }
+    },
+    {
+        name: '+3% Slow-Mo Duration',
+        description: 'Slow-mo lasts longer',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.slowMoDuration *= 1.03;
+        }
+    },
+    {
+        name: '-3% Slow-Mo Cooldown',
+        description: 'Use slow-mo more often',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.slowMoCooldown *= 0.97;
+        }
+    },
+    {
+        name: '+3% Enemy Spawn Delay',
+        description: 'Enemies spawn slower',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.spawnDelayMultiplier *= 1.03;
+        }
+    },
+    
+    // Rare upgrades (25% chance)
     {
         name: '+10% Typing Damage',
-        description: 'Deal more damage to tank enemies',
+        description: 'Deal significantly more damage to tank enemies',
+        rarity: 'rare',
         apply: (gameState) => {
             gameState.typingDamage *= 1.1;
         }
     },
     {
         name: '+5% Slow-Mo Duration',
-        description: 'Slow-mo lasts longer',
+        description: 'Slow-mo lasts noticeably longer',
+        rarity: 'rare',
         apply: (gameState) => {
             gameState.slowMoDuration *= 1.05;
         }
     },
     {
         name: '-5% Slow-Mo Cooldown',
-        description: 'Use slow-mo more often',
+        description: 'Use slow-mo more frequently',
+        rarity: 'rare',
         apply: (gameState) => {
             gameState.slowMoCooldown *= 0.95;
         }
     },
     {
+        name: '+5% Combo Damage Bonus',
+        description: 'Combos deal more damage',
+        rarity: 'rare',
+        apply: (gameState) => {
+            gameState.comboDamageBonus += 0.05;
+        }
+    },
+    
+    // Epic upgrades (12% chance)
+    {
+        name: '+15% Typing Damage',
+        description: 'Deal massive damage to tank enemies',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.typingDamage *= 1.15;
+        }
+    },
+    {
         name: '+1 Max Life',
         description: 'Increase maximum lives',
+        rarity: 'epic',
         apply: (gameState) => {
             gameState.maxLives += 1;
             gameState.lives += 1;
@@ -138,26 +210,212 @@ const UPGRADES = [
     },
     {
         name: '+10% Combo Damage Bonus',
-        description: 'Combos deal more damage',
+        description: 'Combos deal significantly more damage',
+        rarity: 'epic',
         apply: (gameState) => {
             gameState.comboDamageBonus += 0.1;
         }
     },
     {
-        name: '+5% Enemy Spawn Delay',
-        description: 'Enemies spawn slower',
+        name: 'Instant Slow-Mo Reset',
+        description: 'Slow-mo cooldown is instantly reset',
+        rarity: 'epic',
         apply: (gameState) => {
-            gameState.spawnDelayMultiplier *= 1.05;
+            gameState.slowMoReady = true;
+        }
+    },
+    
+    // Legendary upgrades (3% chance)
+    {
+        name: '+25% Typing Damage',
+        description: 'Deal devastating damage to tank enemies',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.typingDamage *= 1.25;
         }
     },
     {
-        name: '+1 Random Power-Up',
-        description: 'Get an extra power-up per wave',
+        name: '+2 Max Lives',
+        description: 'Increase maximum lives by 2',
+        rarity: 'legendary',
         apply: (gameState) => {
-            // This would be handled in the wave system
+            gameState.maxLives += 2;
+            gameState.lives += 2;
+        }
+    },
+    {
+        name: 'Permanent Slow-Mo',
+        description: 'Slow-mo lasts 50% longer and has 50% shorter cooldown',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.slowMoDuration *= 1.5;
+            gameState.slowMoCooldown *= 0.5;
+        }
+    },
+    {
+        name: 'Combo Master',
+        description: 'Combo damage bonus doubled',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.comboDamageBonus *= 2;
         }
     }
 ];
+
+// Lootbox class for managing the opening animation and selection
+class Lootbox {
+    constructor() {
+        this.isOpening = false;
+        this.selectedUpgrade = null;
+        this.spinningUpgrades = [];
+    }
+
+    getRandomRarity() {
+        const roll = Math.random();
+        let cumulative = 0;
+        
+        for (const [rarity, probability] of Object.entries(RARITY_PROBABILITIES)) {
+            cumulative += probability;
+            if (roll <= cumulative) {
+                return rarity;
+            }
+        }
+        return 'common';
+    }
+
+    getRandomUpgrade(rarity) {
+        const upgradesOfRarity = UPGRADES.filter(upgrade => upgrade.rarity === rarity);
+        return upgradesOfRarity[Math.floor(Math.random() * upgradesOfRarity.length)];
+    }
+
+    async openLootbox() {
+        if (this.isOpening) return;
+        
+        this.isOpening = true;
+        
+        // Determine the rarity and upgrade
+        const rarity = this.getRandomRarity();
+        this.selectedUpgrade = this.getRandomUpgrade(rarity);
+        
+        // Create spinning animation
+        this.createSpinningAnimation();
+        
+        // Wait for animation to complete
+        await this.waitForAnimation();
+        
+        // Reveal the final upgrade
+        this.revealUpgrade();
+        
+        this.isOpening = false;
+        
+        return this.selectedUpgrade;
+    }
+
+    createSpinningAnimation() {
+        const container = document.getElementById('lootbox-animation');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Create spinning cards
+        for (let i = 0; i < 20; i++) {
+            const card = document.createElement('div');
+            card.className = 'lootbox-card spinning';
+            
+            // Random upgrade for spinning effect
+            const randomRarity = this.getRandomRarity();
+            const randomUpgrade = this.getRandomUpgrade(randomRarity);
+            
+            card.innerHTML = `
+                <div class="card-rarity" style="color: ${RARITY_COLORS[randomRarity]}">
+                    ${randomRarity.toUpperCase()}
+                </div>
+                <div class="card-name">${randomUpgrade.name}</div>
+                <div class="card-description">${randomUpgrade.description}</div>
+            `;
+            
+            container.appendChild(card);
+        }
+        
+        // Start spinning animation
+        setTimeout(() => {
+            container.classList.add('spinning');
+        }, 100);
+    }
+
+    async waitForAnimation() {
+        return new Promise(resolve => {
+            setTimeout(resolve, 3000); // 3 seconds of spinning
+        });
+    }
+
+    revealUpgrade() {
+        const container = document.getElementById('lootbox-animation');
+        if (!container) return;
+        
+        container.classList.remove('spinning');
+        
+        // Clear spinning cards
+        container.innerHTML = '';
+        
+        // Create particle explosion effect
+        this.createParticleExplosion(container);
+        
+        // Create the final revealed card
+        const card = document.createElement('div');
+        card.className = 'lootbox-card revealed';
+        
+        card.innerHTML = `
+            <div class="card-rarity" style="color: ${RARITY_COLORS[this.selectedUpgrade.rarity]}">
+                ${this.selectedUpgrade.rarity.toUpperCase()}
+            </div>
+            <div class="card-name">${this.selectedUpgrade.name}</div>
+            <div class="card-description">${this.selectedUpgrade.description}</div>
+        `;
+        
+        container.appendChild(card);
+        
+        // Add reveal animation
+        setTimeout(() => {
+            card.classList.add('reveal-animation');
+        }, 100);
+    }
+
+    createParticleExplosion(container) {
+        const particleCount = this.selectedUpgrade.rarity === 'legendary' ? 50 : 
+                            this.selectedUpgrade.rarity === 'epic' ? 30 : 
+                            this.selectedUpgrade.rarity === 'rare' ? 20 : 10;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'lootbox-particle';
+            
+            // Set particle color based on rarity
+            const color = RARITY_COLORS[this.selectedUpgrade.rarity];
+            particle.style.backgroundColor = color;
+            particle.style.boxShadow = `0 0 6px ${color}`;
+            
+            // Random size
+            const size = Math.random() * 8 + 4;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random position and direction
+            const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+            const velocity = Math.random() * 200 + 100;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            container.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => particle.remove(), 1500);
+        }
+    }
+}
 
 // Difficulty Settings
 const DIFFICULTY_SETTINGS = {
@@ -217,6 +475,10 @@ class TypeSlopGame {
         // Current difficulty
         this.currentDifficulty = 'medium';
         this.difficultySettings = DIFFICULTY_SETTINGS.medium;
+        
+        // Initialize lootbox system
+        this.lootbox = new Lootbox();
+        this.currentUpgrade = null;
         
         this.init();
     }
@@ -778,50 +1040,112 @@ class TypeSlopGame {
         this.upgradeWaveCounter.textContent = `lasted ${this.gameState.wave - 1} waves`;
         this.upgradeWaveCounter.style.color = this.waveColors[(this.gameState.wave - 1) % this.waveColors.length];
         
-        const upgradeOptions = document.getElementById('upgrade-options');
-        upgradeOptions.innerHTML = '';
+        // Reset lootbox UI
+        this.resetLootboxUI();
         
-        // Select 3 random upgrades
-        const selectedUpgrades = [];
-        const availableUpgrades = [...UPGRADES];
-        
-        for (let i = 0; i < 3; i++) {
-            const index = Math.floor(Math.random() * availableUpgrades.length);
-            selectedUpgrades.push(availableUpgrades[index]);
-            availableUpgrades.splice(index, 1);
-        }
-        
-        // Create upgrade option elements
-        selectedUpgrades.forEach(upgrade => {
-            const option = document.createElement('div');
-            option.className = 'upgrade-option';
-            option.innerHTML = `
-                <h3>${upgrade.name}</h3>
-                <p>${upgrade.description}</p>
-            `;
-            option.addEventListener('click', () => {
-                console.log('Upgrade clicked:', upgrade.name);
-                
-                // Apply upgrade effect
-                upgrade.apply(this.gameState);
-                
-                // Hide upgrade screen
-                this.upgradeScreen.classList.add('hidden');
-                
-                // Resume game
-                this.gameState.gameRunning = true;
-                this.updateUI();
-                this.startWave();
-                this.gameLoop();
-                
-                // Focus the typing input
-                this.typingInput.focus();
-            });
-            upgradeOptions.appendChild(option);
-        });
+        // Add event listener to lootbox
+        const lootboxElement = document.getElementById('lootbox');
+        lootboxElement.addEventListener('click', () => this.openLootbox(), { once: true });
         
         console.log('Removing hidden class from upgrade screen');
         this.upgradeScreen.classList.remove('hidden');
+    }
+
+    resetLootboxUI() {
+        // Hide animation container and result
+        const animationContainer = document.getElementById('lootbox-animation-container');
+        const result = document.getElementById('lootbox-result');
+        const lootboxElement = document.getElementById('lootbox');
+        
+        animationContainer.style.display = 'none';
+        result.style.display = 'none';
+        lootboxElement.classList.remove('opening');
+        
+        // Clear animation content
+        const animation = document.getElementById('lootbox-animation');
+        animation.innerHTML = '';
+        
+        // Reset lootbox text
+        const lootboxText = lootboxElement.querySelector('.lootbox-text');
+        if (lootboxText) {
+            lootboxText.textContent = 'CLICK TO OPEN';
+        }
+    }
+
+    async openLootbox() {
+        const lootboxElement = document.getElementById('lootbox');
+        const animationContainer = document.getElementById('lootbox-animation-container');
+        const result = document.getElementById('lootbox-result');
+        
+        // Add opening animation to lootbox
+        lootboxElement.classList.add('opening');
+        
+        // Change lootbox text
+        const lootboxText = lootboxElement.querySelector('.lootbox-text');
+        if (lootboxText) {
+            lootboxText.textContent = 'OPENING...';
+        }
+        
+        // Show animation container
+        animationContainer.style.display = 'block';
+        
+        // Open the lootbox and get the upgrade
+        this.currentUpgrade = await this.lootbox.openLootbox();
+        
+        // Hide animation container and show result
+        setTimeout(() => {
+            animationContainer.style.display = 'none';
+            this.showLootboxResult();
+        }, 1000);
+    }
+
+    showLootboxResult() {
+        const result = document.getElementById('lootbox-result');
+        const resultCard = document.getElementById('result-card');
+        
+        // Create result card with the upgrade
+        resultCard.innerHTML = `
+            <div class="card-rarity" style="color: ${RARITY_COLORS[this.currentUpgrade.rarity]}">
+                ${this.currentUpgrade.rarity.toUpperCase()}
+            </div>
+            <div class="card-name">${this.currentUpgrade.name}</div>
+            <div class="card-description">${this.currentUpgrade.description}</div>
+        `;
+        
+        // Set border color based on rarity
+        resultCard.style.borderColor = RARITY_COLORS[this.currentUpgrade.rarity];
+        resultCard.style.boxShadow = `0 0 40px ${RARITY_COLORS[this.currentUpgrade.rarity]}40`;
+        
+        // Show result
+        result.style.display = 'block';
+        
+        // Add continue button event listener
+        const continueBtn = document.getElementById('continue-btn');
+        continueBtn.addEventListener('click', () => this.applyUpgradeAndContinue(), { once: true });
+    }
+
+    applyUpgradeAndContinue() {
+        if (this.currentUpgrade) {
+            console.log('Applying upgrade:', this.currentUpgrade.name);
+            
+            // Apply upgrade effect
+            this.currentUpgrade.apply(this.gameState);
+            
+            // Hide upgrade screen
+            this.upgradeScreen.classList.add('hidden');
+            
+            // Resume game
+            this.gameState.gameRunning = true;
+            this.updateUI();
+            this.startWave();
+            this.gameLoop();
+            
+            // Focus the typing input
+            this.typingInput.focus();
+            
+            // Clear current upgrade
+            this.currentUpgrade = null;
+        }
     }
 
     gameOver() {

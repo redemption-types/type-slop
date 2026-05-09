@@ -34,9 +34,29 @@
 
         <!-- Upgrade Screen -->
         <div id="upgrade-screen" class="hidden">
-            <h2>Choose an Upgrade</h2>
+            <h2>🎁 LOOTBOX UNBOXING 🎁</h2>
             <div class="upgrade-wave-counter" id="upgrade-wave-counter">lasted 0 waves</div>
-            <div id="upgrade-options"></div>
+            
+            <div class="lootbox-container">
+                <div class="lootbox" id="lootbox">
+                    <div class="lootbox-lid">
+                        <div class="lootbox-glow"></div>
+                    </div>
+                    <div class="lootbox-body">
+                        <div class="lootbox-text">CLICK TO OPEN</div>
+                    </div>
+                </div>
+                
+                <div class="lootbox-animation-container" id="lootbox-animation-container">
+                    <div class="lootbox-animation" id="lootbox-animation"></div>
+                </div>
+                
+                <div class="lootbox-result" id="lootbox-result" style="display: none;">
+                    <h3>You Got:</h3>
+                    <div class="result-card" id="result-card"></div>
+                    <button id="continue-btn" class="continue-button">Continue</button>
+                </div>
+            </div>
         </div>
 
         <!-- Game Over Screen -->
