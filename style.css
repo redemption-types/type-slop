@@ -955,6 +955,40 @@ body::before {
     transform: scale(1.1) rotate(5deg);
 }
 
+.lootbox-prompt {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(12px, 2.5vw, 16px);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+    background: none;
+    padding: 0;
+    border: none;
+    z-index: 10;
+    pointer-events: none;
+    animation: prompt-pulse 4s ease-in-out infinite;
+    transition: all 0.5s ease;
+}
+
+@keyframes prompt-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.lootbox.opening .lootbox-prompt {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    pointer-events: none;
+}
+
+.lootbox.opened .lootbox-prompt {
+    display: none;
+}
+
 .lootbox.opening .lootbox-image {
     animation: lootbox-shake 0.5s ease-in-out;
 }
