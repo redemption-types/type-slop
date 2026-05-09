@@ -354,27 +354,32 @@ class Lootbox {
     }
 
     startCSGOSpinning(track, targetIndex) {
-        const cardWidth = 200; // Width of each card
-        const cardMargin = 20; // Margin between cards from CSS
+        const cardWidth = 180;
+        const cardMargin = 20;
         const totalCardWidth = cardWidth + cardMargin;
         const containerWidth = track.parentElement.offsetWidth;
-        const centerPosition = containerWidth / 2;
         
-        // Calculate the exact position needed to center the target card under the marker
-        // The target card should be positioned so its center aligns with the container center
-        const targetPosition = centerPosition - (targetIndex * totalCardWidth) - (cardWidth / 2);
+        // Calculate exact position to center target card under the marker
+        // The marker is positioned at left: 50% of the container
+        // So we need the target card's center to be at the container's 50% mark
+        const targetCardStart = targetIndex * totalCardWidth;
+        const targetCardCenter = targetCardStart + (cardWidth / 2);
+        const containerHalfWidth = containerWidth / 2;
         
-        // Set initial position far to the right
+        // Final position should place the target card's center at the container's center
+        const finalPosition = containerHalfWidth - targetCardCenter;
+        
+        // Start from far right (outside container)
         track.style.transform = `translateX(${containerWidth}px)`;
         track.style.transition = 'none';
         
         // Force reflow
         track.offsetHeight;
         
-        // Start scrolling with the corrected target position
+        // Animate to final centered position
         setTimeout(() => {
             track.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
-            track.style.transform = `translateX(${targetPosition}px)`;
+            track.style.transform = `translateX(${finalPosition}px)`;
         }, 50);
     }
 
