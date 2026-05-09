@@ -388,32 +388,35 @@ class Lootbox {
         const container = document.getElementById('lootbox-animation');
         if (!container) return;
         
-        container.classList.remove('spinning');
-        
-        // Clear spinning cards
-        container.innerHTML = '';
-        
-        // Create particle explosion effect
-        this.createParticleExplosion(container);
-        
-        // Create the final revealed card
-        const card = document.createElement('div');
-        card.className = 'lootbox-card revealed';
-        
-        card.innerHTML = `
-            <div class="card-rarity" style="color: ${RARITY_COLORS[this.selectedUpgrade.rarity]}">
-                ${this.selectedUpgrade.rarity.toUpperCase()}
-            </div>
-            <div class="card-name">${this.selectedUpgrade.name}</div>
-            <div class="card-description">${this.selectedUpgrade.description}</div>
-        `;
-        
-        container.appendChild(card);
-        
-        // Add reveal animation
+        // Wait a moment for the spinning animation to fully settle
         setTimeout(() => {
-            card.classList.add('reveal-animation');
-        }, 100);
+            container.classList.remove('spinning');
+            
+            // Just clear the container without any fade animation
+            container.innerHTML = '';
+            
+            // Create particle explosion effect
+            this.createParticleExplosion(container);
+            
+            // Create the final revealed card
+            const card = document.createElement('div');
+            card.className = 'lootbox-card revealed';
+            
+            card.innerHTML = `
+                <div class="card-rarity" style="color: ${RARITY_COLORS[this.selectedUpgrade.rarity]}">
+                    ${this.selectedUpgrade.rarity.toUpperCase()}
+                </div>
+                <div class="card-name">${this.selectedUpgrade.name}</div>
+                <div class="card-description">${this.selectedUpgrade.description}</div>
+            `;
+            
+            container.appendChild(card);
+            
+            // Add reveal animation
+            setTimeout(() => {
+                card.classList.add('reveal-animation');
+            }, 100);
+        }, 200); // Small delay to ensure animation settles
     }
 
     createParticleExplosion(container) {
@@ -1134,7 +1137,7 @@ class TypeSlopGame {
         setTimeout(() => {
             animationContainer.style.display = 'none';
             this.showLootboxResult();
-        }, 1000);
+        }, 1000); // Reduced timing since we removed fade-out animation
     }
 
     createExplosionEffect(lootboxElement) {
