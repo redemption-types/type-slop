@@ -317,35 +317,65 @@ class Lootbox {
         
         container.innerHTML = '';
         
-        // Create spinning cards
-        for (let i = 0; i < 20; i++) {
+        // Create horizontal scrolling track
+        const track = document.createElement('div');
+        track.className = 'csgo-track';
+        
+        // Create many cards for horizontal scrolling
+        const cardCount = 50;
+        const targetIndex = Math.floor(cardCount * 0.75); // Target position for final result
+        
+        for (let i = 0; i < cardCount; i++) {
             const card = document.createElement('div');
-            card.className = 'lootbox-card spinning';
+            card.className = 'csgo-card';
             
-            // Random upgrade for spinning effect
-            const randomRarity = this.getRandomRarity();
-            const randomUpgrade = this.getRandomUpgrade(randomRarity);
+            // Determine if this is the winning card
+            const isWinningCard = i === targetIndex;
+            const rarity = isWinningCard ? this.selectedUpgrade.rarity : this.getRandomRarity();
+            const upgrade = isWinningCard ? this.selectedUpgrade : this.getRandomUpgrade(rarity);
             
             card.innerHTML = `
-                <div class="card-rarity" style="color: ${RARITY_COLORS[randomRarity]}">
-                    ${randomRarity.toUpperCase()}
+                <div class="csgo-card-rarity" style="color: ${RARITY_COLORS[rarity]}">
+                    ${rarity.toUpperCase()}
                 </div>
-                <div class="card-name">${randomUpgrade.name}</div>
-                <div class="card-description">${randomUpgrade.description}</div>
+                <div class="csgo-card-name">${upgrade.name}</div>
+                <div class="csgo-card-desc">${upgrade.description}</div>
             `;
             
-            container.appendChild(card);
+            track.appendChild(card);
         }
         
-        // Start spinning animation
+        container.appendChild(track);
+        
+        // Start horizontal scrolling animation
         setTimeout(() => {
-            container.classList.add('spinning');
+            this.startCSGOSpinning(track, targetIndex);
         }, 100);
+    }
+
+    startCSGOSpinning(track, targetIndex) {
+        const cardWidth = 200; // Width of each card
+        const containerWidth = track.parentElement.offsetWidth;
+        const centerPosition = containerWidth / 2;
+        const targetPosition = -(targetIndex * cardWidth) + centerPosition - (cardWidth / 2);
+        
+        // Set initial position far to the right
+        track.style.transform = `translateX(${containerWidth}px)`;
+        track.style.transition = 'none';
+        
+        // Force reflow
+        track.offsetHeight;
+        
+        // Start scrolling
+        setTimeout(() => {
+            track.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+            track.style.transform = `translateX(${targetPosition}px)`;
+        }, 50);
     }
 
     async waitForAnimation() {
         return new Promise(resolve => {
-            setTimeout(resolve, 3000); // 3 seconds of spinning
+            setTimeout(resolve, 4000); // 4 seconds for CSGO-style animation
         });
     }
 
@@ -1065,10 +1095,10 @@ class TypeSlopGame {
         const animation = document.getElementById('lootbox-animation');
         animation.innerHTML = '';
         
-        // Reset lootbox text
-        const lootboxText = lootboxElement.querySelector('.lootbox-text');
-        if (lootboxText) {
-            lootboxText.textContent = 'CLICK TO OPEN';
+        // Reset lootbox image to closed state
+        const lootboxImage = document.getElementById('lootbox-image');
+        if (lootboxImage) {
+            lootboxImage.src = 'lootbox-close-state.png';
         }
     }
 
@@ -1076,15 +1106,18 @@ class TypeSlopGame {
         const lootboxElement = document.getElementById('lootbox');
         const animationContainer = document.getElementById('lootbox-animation-container');
         const result = document.getElementById('lootbox-result');
+        const lootboxImage = document.getElementById('lootbox-image');
         
         // Add opening animation to lootbox
         lootboxElement.classList.add('opening');
         
-        // Change lootbox text
-        const lootboxText = lootboxElement.querySelector('.lootbox-text');
-        if (lootboxText) {
-            lootboxText.textContent = 'OPENING...';
+        // Change lootbox image to open state
+        if (lootboxImage) {
+            lootboxImage.src = 'lootbox-open-state.png';
         }
+        
+        // Create explosion sparkle effect
+        this.createExplosionEffect(lootboxElement);
         
         // Show animation container
         animationContainer.style.display = 'block';
@@ -1097,6 +1130,54 @@ class TypeSlopGame {
             animationContainer.style.display = 'none';
             this.showLootboxResult();
         }, 1000);
+    }
+
+    createExplosionEffect(lootboxElement) {
+        const rect = lootboxElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        // Create sparkle particles
+        const particleCount = 30;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'explosion-sparkle';
+            
+            // Random color for sparkles
+            const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#667eea', '#764ba2', '#f093fb'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.style.backgroundColor = color;
+            particle.style.boxShadow = `0 0 10px ${color}`;
+            
+            // Random size
+            const size = Math.random() * 8 + 4;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Calculate random direction
+            const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.5;
+            const velocity = Math.random() * 300 + 200;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            // Position at center of lootbox
+            particle.style.position = 'fixed';
+            particle.style.left = `${centerX}px`;
+            particle.style.top = `${centerY}px`;
+            particle.style.transform = 'translate(-50%, -50%)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '9999';
+            
+            document.body.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => particle.remove(), 2000);
+        }
     }
 
     showLootboxResult() {
