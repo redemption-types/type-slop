@@ -580,8 +580,8 @@ class TypeSlopGame {
             powerUp.y += 1;
             powerUp.element.style.top = `${powerUp.y}px`;
             
-            // Check if power-up reached player line
-            if (powerUp.y > this.gameArea.offsetHeight - 60) {
+            // Check if power-up reached player line (collect earlier to prevent falling off)
+            if (powerUp.y > this.gameArea.offsetHeight - 80) {
                 this.collectPowerUp(powerUp);
             }
         });
