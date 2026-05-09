@@ -550,14 +550,15 @@ button:hover {
 }
 
 .alien-image {
-    width: 90px;
-    height: 90px;
-    background-image: url('Copilot_20260508_215208.png');
+    width: 80px;
+    height: 80px;
+    background-image: url('alien-dmd-transp.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     animation: alien-appear-fade 1.5s ease-out forwards;
-    filter: brightness(1);
+    filter: brightness(1) contrast(1.2);
+    mix-blend-mode: screen;
 }
 
 @keyframes alien-appear-fade {
