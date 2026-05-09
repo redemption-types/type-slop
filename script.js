@@ -54,6 +54,7 @@ class GameState {
         this.maxLives = 3;
         this.waveCompleted = false;
         this.waveEnemiesSpawned = false;
+        this.firstEnemySpawned = false;
     }
 }
 
@@ -63,12 +64,13 @@ class Enemy {
         this.id = Math.random().toString(36).substr(2, 9);
         this.word = word;
         this.type = type;
-        this.hp = type === 'tank' ? 2 : 1;
+        this.hp = type === 'tank' || type === 'double' ? 2 : 1;
         this.maxHp = this.hp;
         this.x = x;
         this.y = y;
         this.speed = this.getBaseSpeed();
         this.element = null;
+        this.originalWord = word;
     }
 
     getBaseSpeed() {
@@ -76,6 +78,7 @@ class Enemy {
         switch (this.type) {
             case 'fast': return baseSpeed * 1.5;
             case 'tank': return baseSpeed * 0.8;
+            case 'double': return baseSpeed * 1.2; // Slightly faster than normal
             default: return baseSpeed;
         }
     }
@@ -85,6 +88,16 @@ class Enemy {
         if (this.hp <= 0) {
             return true; // Enemy destroyed
         }
+        
+        // For double enemies, swap to a new shorter word after first hit
+        if (this.type === 'double' && this.hp === 1) {
+            const shortWords = WORD_LISTS.short;
+            const newWord = shortWords[Math.floor(Math.random() * shortWords.length)];
+            this.word = newWord;
+            this.originalWord = newWord;
+            return false; // Enemy still alive but word changed
+        }
+        
         return false; // Enemy still alive
     }
 }
@@ -166,6 +179,7 @@ class TypeSlopGame {
         this.scoreDisplay = document.getElementById('score');
         this.comboDisplay = document.getElementById('combo');
         this.slowmoFill = document.getElementById('slowmo-fill');
+        this.waveCounter = document.getElementById('wave-counter');
         this.startScreen = document.getElementById('start-screen');
         this.upgradeScreen = document.getElementById('upgrade-screen');
         this.gameOverScreen = document.getElementById('game-over-screen');
@@ -175,6 +189,9 @@ class TypeSlopGame {
         this.animationId = null;
         this.slowMoTimeout = null;
         this.slowMoCooldownTimeout = null;
+        
+        // Colors for wave counter
+        this.waveColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#48dbfb'];
         
         this.init();
     }
@@ -231,6 +248,7 @@ class TypeSlopGame {
         // Reset wave flags
         this.gameState.waveCompleted = false;
         this.gameState.waveEnemiesSpawned = false;
+        this.gameState.firstEnemySpawned = false;
         
         const enemyCount = 5 + this.gameState.wave;
         this.spawnWaveEnemies(enemyCount);
@@ -239,9 +257,15 @@ class TypeSlopGame {
     spawnWaveEnemies(count) {
         const types = ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', // 70% normal
                       'fast', 'fast', // 20% fast
-                      'tank']; // 10% tank
+                      'double']; // 10% double HP enemies (replaced tank)
         
         console.log(`Spawning ${count} enemies for wave ${this.gameState.wave}`);
+        
+        // Mark that enemies are being spawned (with delay to prevent immediate completion)
+        setTimeout(() => {
+            this.gameState.waveEnemiesSpawned = true;
+            console.log('Wave enemies spawned flag set to true after delay');
+        }, 500); // 500ms delay before allowing wave completion
         
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
@@ -258,8 +282,8 @@ class TypeSlopGame {
                 
                 // Mark that enemies have started spawning (only on first enemy)
                 if (i === 0) {
-                    this.gameState.waveEnemiesSpawned = true;
-                    console.log('First enemy spawned, setting waveEnemiesSpawned to true');
+                    this.gameState.firstEnemySpawned = true;
+                    console.log('First enemy spawned, setting firstEnemySpawned to true');
                 }
                 
                 console.log(`Spawned enemy: ${word} (${type}) at position ${x}`);
@@ -270,7 +294,8 @@ class TypeSlopGame {
     getWordListForType(type) {
         switch (type) {
             case 'fast': return WORD_LISTS.short;
-            case 'tank': return WORD_LISTS.long;
+            case 'tank': return WORD_LISTS.medium; // Use normal length words for tank
+            case 'double': return WORD_LISTS.short; // Use short words for double HP enemies
             default: return WORD_LISTS.medium;
         }
     }
@@ -278,15 +303,18 @@ class TypeSlopGame {
     createEnemyElement(enemy) {
         const element = document.createElement('div');
         element.className = `enemy ${enemy.type}`;
-        element.textContent = enemy.word;
+        
+        // Create text content with HP for multi-HP enemies
+        if ((enemy.type === 'tank' || enemy.type === 'double') && enemy.hp > 1) {
+            element.textContent = `${enemy.word} HP:${enemy.hp}`;
+        } else {
+            element.textContent = enemy.word;
+        }
+        
         element.style.position = 'absolute';
         element.style.left = `${enemy.x}px`;
         element.style.top = `${enemy.y}px`;
         element.style.zIndex = '10';
-        
-        if (enemy.type === 'tank' && enemy.hp === 2) {
-            element.classList.add('hp-2');
-        }
         
         enemy.element = element;
         this.enemiesContainer.appendChild(element);
@@ -356,8 +384,19 @@ class TypeSlopGame {
             enemy.element.classList.add('damaged');
             setTimeout(() => enemy.element.classList.remove('damaged'), 300);
             
+            // Update enemy text to show new HP or word change
             if (enemy.type === 'tank') {
-                enemy.element.classList.remove('hp-2');
+                if (enemy.hp > 1) {
+                    enemy.element.textContent = `${enemy.word} HP:${enemy.hp}`;
+                } else {
+                    enemy.element.textContent = enemy.word;
+                }
+            } else if (enemy.type === 'double') {
+                if (enemy.hp > 1) {
+                    enemy.element.textContent = `${enemy.word} HP:${enemy.hp}`;
+                } else {
+                    enemy.element.textContent = enemy.word; // Show new word after swap
+                }
             }
         }
         
@@ -367,7 +406,7 @@ class TypeSlopGame {
     dropPowerUp(x, y) {
         const types = ['freeze', 'nuke', 'heal'];
         const type = types[Math.floor(Math.random() * types.length)];
-        const powerUp = new PowerUp(type, x, y);
+        const powerUp = new PowerUp(type, x, y + 20); // Spawn 20px below enemy
         this.gameState.powerUps.push(powerUp);
         this.createPowerUpElement(powerUp);
     }
@@ -375,7 +414,22 @@ class TypeSlopGame {
     createPowerUpElement(powerUp) {
         const element = document.createElement('div');
         element.className = `powerup ${powerUp.type}`;
-        element.textContent = powerUp.type[0].toUpperCase();
+        
+        // Use emojis for power-ups
+        let emoji = '';
+        switch (powerUp.type) {
+            case 'freeze':
+                emoji = '❄️';
+                break;
+            case 'nuke':
+                emoji = '💣';
+                break;
+            case 'heal':
+                emoji = '❤️';
+                break;
+        }
+        
+        element.textContent = emoji;
         element.style.left = `${powerUp.x}px`;
         element.style.top = `${powerUp.y}px`;
         
@@ -392,6 +446,31 @@ class TypeSlopGame {
         
         this.enemiesContainer.appendChild(popup);
         setTimeout(() => popup.remove(), 1000);
+    }
+
+    showPowerUpPopup(x, y, type) {
+        const popup = document.createElement('div');
+        popup.className = 'powerup-popup';
+        
+        let text = '';
+        switch (type) {
+            case 'freeze':
+                text = 'FREEZE!';
+                break;
+            case 'nuke':
+                text = 'NUKE!';
+                break;
+            case 'heal':
+                text = 'HEAL!';
+                break;
+        }
+        
+        popup.textContent = text;
+        popup.style.left = `${x}px`;
+        popup.style.top = `${y}px`;
+        
+        this.enemiesContainer.appendChild(popup);
+        setTimeout(() => popup.remove(), 1500);
     }
 
     handleKeyDown(e) {
@@ -461,12 +540,14 @@ class TypeSlopGame {
         });
         
         // Check wave completion - only if enemies have been spawned and all are destroyed
-        if (this.gameState.enemies.length === 0 && this.gameState.gameRunning && this.gameState.waveEnemiesSpawned) {
+        if (this.gameState.enemies.length === 0 && this.gameState.gameRunning && this.gameState.waveEnemiesSpawned && this.gameState.firstEnemySpawned) {
             console.log('GAME LOOP: Checking wave completion');
             console.log('Enemies length:', this.gameState.enemies.length);
             console.log('Game running:', this.gameState.gameRunning);
             console.log('Wave completed flag:', this.gameState.waveCompleted);
             console.log('Wave enemies spawned flag:', this.gameState.waveEnemiesSpawned);
+            console.log('First enemy spawned flag:', this.gameState.firstEnemySpawned);
+            console.log('Current wave:', this.gameState.wave);
             this.completeWave();
         }
         
@@ -488,6 +569,9 @@ class TypeSlopGame {
     collectPowerUp(powerUp) {
         this.gameState.powerUps = this.gameState.powerUps.filter(p => p.id !== powerUp.id);
         powerUp.element.remove();
+        
+        // Show power-up popup
+        this.showPowerUpPopup(powerUp.x, powerUp.y, powerUp.type);
         
         switch (powerUp.type) {
             case 'freeze':
@@ -552,6 +636,9 @@ class TypeSlopGame {
     showUpgradeScreen() {
         console.log('=== SHOW UPGRADE SCREEN CALLED ===');
         
+        // Clear typing input
+        this.typingInput.value = '';
+        
         const upgradeOptions = document.getElementById('upgrade-options');
         upgradeOptions.innerHTML = '';
         
@@ -575,11 +662,14 @@ class TypeSlopGame {
             `;
             option.addEventListener('click', () => {
                 console.log('Upgrade clicked:', upgrade.name);
+                console.log('Wave before increment:', this.gameState.wave);
+                
                 // Apply upgrade effect
                 upgrade.apply(this.gameState);
                 
                 // Increment wave
                 this.gameState.wave++;
+                console.log('Wave after increment:', this.gameState.wave);
                 
                 // Hide upgrade screen
                 this.upgradeScreen.classList.add('hidden');
@@ -589,6 +679,9 @@ class TypeSlopGame {
                 this.updateUI();
                 this.startWave();
                 this.gameLoop();
+                
+                // Focus the typing input
+                this.typingInput.focus();
             });
             upgradeOptions.appendChild(option);
         });
@@ -611,6 +704,10 @@ class TypeSlopGame {
         this.livesDisplay.textContent = this.gameState.lives;
         this.scoreDisplay.textContent = this.gameState.score;
         this.comboDisplay.textContent = this.gameState.combo;
+        
+        // Update wave counter with color
+        this.waveCounter.textContent = `lasted ${this.gameState.wave - 1} waves`;
+        this.waveCounter.style.color = this.waveColors[(this.gameState.wave - 1) % this.waveColors.length];
     }
 }
 
