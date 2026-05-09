@@ -1,36 +1,26 @@
 // Word Lists categorized by length
 const WORD_LISTS = {
     short: [ // 3-5 letters for fast enemies
-        'cat', 'dog', 'run', 'jump', 'quick', 'brown', 'fox', 'lazy', 'red', 'blue',
-        'green', 'fast', 'slow', 'big', 'small', 'hot', 'cold', 'new', 'old', 'young',
-        'happy', 'sad', 'mad', 'glad', 'bad', 'good', 'nice', 'mean', 'kind', 'wild',
-        'tame', 'free', 'bind', 'lose', 'find', 'seek', 'hide', 'show', 'tell', 'ask',
-        'give', 'take', 'make', 'break', 'build', 'burn', 'turn', 'learn', 'teach', 'reach'
+        'tooth', 'gum', 'bite', 'ache', 'mint', 'floss', 'cusp', 'root', 'crown', 'drill',
+        'prep', 'etch', 'seal', 'pain', 'numb', 'snap', 'chip', 'pull', 'oral', 'jaw',
+        'molar', 'ridge', 'paste', 'brush', 'rinse', 'probe', 'scrub', 'clean', 'fresh'
     ],
     medium: [ // 4-7 letters for normal enemies
-        'house', 'mouse', 'computer', 'keyboard', 'monitor', 'screen', 'window', 'door',
-        'table', 'chair', 'desk', 'phone', 'tablet', 'laptop', 'coffee', 'water', 'juice',
-        'pizza', 'burger', 'salad', 'pasta', 'bread', 'cheese', 'butter', 'sugar', 'salt',
-        'pepper', 'onion', 'garlic', 'potato', 'tomato', 'carrot', 'banana', 'apple',
-        'orange', 'grape', 'melon', 'berry', 'peach', 'lemon', 'lime', 'mango', 'cherry',
-        'garden', 'flower', 'tree', 'grass', 'plant', 'seed', 'soil', 'water', 'sun', 'moon',
-        'star', 'cloud', 'rain', 'snow', 'wind', 'storm', 'thunder', 'lightning', 'rainbow',
-        'mountain', 'valley', 'river', 'ocean', 'beach', 'sand', 'rock', 'stone', 'metal',
-        'wood', 'plastic', 'glass', 'paper', 'book', 'pen', 'pencil', 'eraser', 'ruler'
+        'enamel', 'dentin', 'canine', 'molar', 'occlus', 'gingiva',
+        'plaque', 'tartar', 'scaler', 'polish', 'cement', 'matrix', 'rubber',
+        'damper', 'suture', 'abscess', 'lesion', 'filling', 'caries', 'decay',
+        'bonding', 'etchant', 'bursize', 'impress', 'digital', 'scanner', 'xray', 'sensor',
+        'saliva', 'tongue', 'buccal', 'lingual', 'mesial', 'distal', 'apical', 'coronal'
     ],
     long: [ // 8-12 letters for tank enemies
-        'adventure', 'beautiful', 'challenge', 'dangerous', 'elephant', 'fantastic',
-        'gigantic', 'happiness', 'important', 'incredible', 'knowledge', 'language',
-        'magnificent', 'necessary', 'opportunity', 'phenomenon', 'qualitative', 'remarkable',
-        'spectacular', 'technology', 'understand', 'vegetable', 'wonderful', 'xylophone',
-        'yesterday', 'zoological', 'atmosphere', 'butterfly', 'chocolate', 'discovery',
-        'encyclopedia', 'fascinating', 'gymnasium', 'helicopter', 'imagination', 'jellyfish',
-        'kaleidoscope', 'laboratory', 'mathematics', 'navigation', 'observation', 'parliament',
-        'quarantine', 'restaurant', 'submarine', 'television', 'university', 'vegetarian',
-        'watermelon', 'xylophonist', 'youthfulness', 'zoologist', 'achievement', 'basketball',
-        'celebration', 'determination', 'environment', 'friendship', 'government', 'helicopter'
+        'periodontal', 'endodontics', 'orthodontic', 'prosthodont', 'hygienist',
+        'malocclusion', 'radiograph', 'anesthesia', 'temporomand', 'implantology',
+        'debridement', 'fluoridation', 'osseointegr', 'pathologist', 'maxillofac',
+        'biocompat', 'articulation', 'sterilizer', 'amalgamation', 'odontogenic',
+        'periapical', 'gingivectomy', 'odontoplasty', 'occlusogram'
     ]
 };
+
 
 // Game State
 class GameState {
@@ -75,11 +65,13 @@ class Enemy {
 
     getBaseSpeed() {
         const baseSpeed = 1; // pixels per frame
+        const game = window.game; // Reference to game instance for difficulty
+        
         switch (this.type) {
-            case 'fast': return baseSpeed * 1.5;
-            case 'tank': return baseSpeed * 0.8;
-            case 'double': return baseSpeed * 1.2; // Slightly faster than normal
-            default: return baseSpeed;
+            case 'fast': return baseSpeed * 1.5 * (game ? game.difficultySettings.fastSpeedBonus : 1);
+            case 'tank': return baseSpeed * 0.8 * (game ? game.difficultySettings.tankSpeedBonus : 1);
+            case 'double': return baseSpeed * 1.2 * (game ? game.difficultySettings.doubleSpeedBonus : 1);
+            default: return baseSpeed * (game ? game.difficultySettings.enemySpeedBonus : 1);
         }
     }
 
@@ -167,6 +159,34 @@ const UPGRADES = [
     }
 ];
 
+// Difficulty Settings
+const DIFFICULTY_SETTINGS = {
+    easy: {
+        enemySpeedMultiplier: 0.7,  // 30% slower
+        spawnDelayMultiplier: 1.3,   // 30% slower spawning
+        enemySpeedBonus: 0.7,
+        fastSpeedBonus: 0.7,
+        tankSpeedBonus: 0.7,
+        doubleSpeedBonus: 0.7
+    },
+    medium: {
+        enemySpeedMultiplier: 1.0,  // Normal speed
+        spawnDelayMultiplier: 1.0,   // Normal spawning
+        enemySpeedBonus: 1.0,
+        fastSpeedBonus: 1.0,
+        tankSpeedBonus: 1.0,
+        doubleSpeedBonus: 1.0
+    },
+    hard: {
+        enemySpeedMultiplier: 1.3,  // 30% faster
+        spawnDelayMultiplier: 0.8,   // 20% faster spawning
+        enemySpeedBonus: 1.3,
+        fastSpeedBonus: 1.3,
+        tankSpeedBonus: 1.3,
+        doubleSpeedBonus: 1.3
+    }
+};
+
 // Main Game Class
 class TypeSlopGame {
     constructor() {
@@ -193,7 +213,22 @@ class TypeSlopGame {
         // Colors for wave counter
         this.waveColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#48dbfb'];
         
+        // Current difficulty
+        this.currentDifficulty = 'medium';
+        this.difficultySettings = DIFFICULTY_SETTINGS.medium;
+        
         this.init();
+    }
+
+    selectDifficulty(difficulty) {
+        this.currentDifficulty = difficulty;
+        this.difficultySettings = DIFFICULTY_SETTINGS[difficulty];
+        
+        // Update button states
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-difficulty="${difficulty}"]`).classList.add('active');
     }
 
     init() {
@@ -203,8 +238,16 @@ class TypeSlopGame {
         this.typingInput.addEventListener('input', (e) => this.handleTyping(e));
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         
+        // Difficulty selection event listeners
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.selectDifficulty(e.target.dataset.difficulty));
+        });
+        
         // Focus input on load
         this.typingInput.focus();
+        
+        // Set global reference for enemy speed calculations
+        window.game = this;
     }
 
     startGame() {
@@ -223,6 +266,8 @@ class TypeSlopGame {
         // Reset game state
         this.gameState = new GameState();
         this.gameState.gameRunning = true;
+        this.gameState.enemySpeedMultiplier = this.difficultySettings.enemySpeedMultiplier;
+        this.gameState.spawnDelayMultiplier = this.difficultySettings.spawnDelayMultiplier;
         
         console.log('After reset - enemies:', this.gameState.enemies.length);
         console.log('After reset - game running:', this.gameState.gameRunning);
@@ -241,7 +286,9 @@ class TypeSlopGame {
 
     restartGame() {
         this.gameOverScreen.classList.add('hidden');
+        this.typingInput.value = '';
         this.startGame();
+        this.typingInput.focus();
     }
 
     startWave() {
@@ -287,7 +334,7 @@ class TypeSlopGame {
                 }
                 
                 console.log(`Spawned enemy: ${word} (${type}) at position ${x}`);
-            }, 1000 + i * 1000); // 1 second base delay + 1 second intervals
+            }, 1000 + i * 1000 * this.difficultySettings.spawnDelayMultiplier); // 1 second base delay + difficulty-adjusted intervals
         }
     }
 
