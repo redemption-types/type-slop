@@ -1514,8 +1514,10 @@ body::before {
     text-align: center;
     animation: fade-in 0.5s ease-out;
     margin-top: auto;
-    padding-top: 10px;
+    padding-top: 15px;
+    padding-bottom: 10px;
     flex-shrink: 0;
+    min-height: fit-content;
 }
 
 @keyframes fade-in {
@@ -1532,17 +1534,25 @@ body::before {
 
 .result-card {
     width: clamp(160px, 30vw, 200px);
-    height: clamp(100px, 15vh, 140px);
+    min-height: clamp(100px, 15vh, 140px);
+    max-height: clamp(140px, 20vh, 180px);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
     border: 3px solid #FFD700;
     border-radius: 16px;
     padding: 12px;
-    margin: 0 auto 12px;
+    margin: 0 auto 15px;
     text-align: center;
     backdrop-filter: blur(15px);
     box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
     animation: result-glow 2s ease-in-out infinite;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 @keyframes result-glow {
@@ -1554,15 +1564,17 @@ body::before {
     background: linear-gradient(135deg, #4ecdc4 0%, #44a3aa 100%);
     border: none;
     border-radius: 20px;
-    padding: clamp(6px, 1.5vh, 10px) clamp(16px, 4vw, 20px);
+    padding: clamp(8px, 1.5vh, 12px) clamp(16px, 4vw, 25px);
     font-size: clamp(11px, 2.2vw, 14px);
     font-weight: bold;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-    margin-top: auto;
+    margin-top: 15px;
     flex-shrink: 0;
+    min-height: fit-content;
+    white-space: nowrap;
 }
 
 .continue-button:hover {
@@ -1622,19 +1634,25 @@ body::before {
     
     .result-card {
         width: clamp(140px, 25vw, 180px);
-        height: clamp(80px, 12vh, 120px);
+        min-height: clamp(80px, 12vh, 120px);
+        max-height: clamp(120px, 18vh, 150px);
         padding: 10px;
-        margin: 0 auto 10px;
+        margin: 0 auto 15px;
+        overflow: hidden;
+        word-wrap: break-word;
+        hyphens: auto;
     }
     
     .lootbox-result h3 {
         font-size: clamp(14px, 2.5vw, 18px);
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
     
     .continue-button {
-        padding: clamp(5px, 1.2vh, 8px) clamp(12px, 3vw, 16px);
+        padding: clamp(6px, 1.2vh, 10px) clamp(12px, 3vw, 20px);
         font-size: clamp(10px, 2vw, 12px);
+        margin-top: 12px;
+        white-space: nowrap;
     }
 }
 
@@ -1666,13 +1684,19 @@ body::before {
     }
     
     .result-card {
-        height: clamp(70px, 10vh, 100px);
+        min-height: clamp(70px, 10vh, 100px);
+        max-height: clamp(100px, 15vh, 120px);
         padding: 8px;
+        overflow: hidden;
+        word-wrap: break-word;
+        hyphens: auto;
     }
     
     .continue-button {
-        padding: clamp(4px, 1vh, 6px) clamp(10px, 2.5vw, 14px);
+        padding: clamp(5px, 1vh, 8px) clamp(10px, 2.5vw, 16px);
         font-size: clamp(9px, 1.8vw, 11px);
+        margin-top: 10px;
+        white-space: nowrap;
     }
 }
 
