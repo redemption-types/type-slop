@@ -840,21 +840,31 @@ class TypeSlopGame {
             return;
         }
 
-        let matchedEnemy = null;
+        let matchedEnemies = [];
         for (const enemy of this.gameState.enemies) {
             if (enemy.word.toLowerCase().startsWith(typedText)) {
-                matchedEnemy = enemy;
-                break;
+                matchedEnemies.push(enemy);
             }
         }
 
         this.clearEnemyHighlights();
         
-        if (matchedEnemy) {
-            matchedEnemy.element.classList.add('matched');
+        if (matchedEnemies.length > 0) {
+            // Highlight all matched enemies
+            matchedEnemies.forEach(enemy => {
+                enemy.element.classList.add('matched');
+            });
             
-            if (matchedEnemy.word.toLowerCase() === typedText) {
-                this.destroyEnemy(matchedEnemy);
+            // If exact match, destroy all enemies with that word
+            if (matchedEnemies[0].word.toLowerCase() === typedText) {
+                const enemiesToDestroy = this.gameState.enemies.filter(enemy => 
+                    enemy.word.toLowerCase() === typedText
+                );
+                
+                enemiesToDestroy.forEach(enemy => {
+                    this.destroyEnemy(enemy);
+                });
+                
                 this.typingInput.value = '';
                 e.target.value = '';
             }
