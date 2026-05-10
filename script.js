@@ -741,12 +741,55 @@ class TypeSlopGame {
         }
     }
 
+    getWordListsByWave() {
+        const wave = this.gameState.wave;
+        
+        if (wave <= 3) {
+            // Waves 1-3: short only
+            return ['short'];
+        } else if (wave <= 7) {
+            // Waves 4-7: short + medium (50/50 mix)
+            return ['short', 'short', 'medium'];
+        } else if (wave <= 12) {
+            // Waves 8-12: short + medium but more medium density
+            return ['short', 'medium', 'medium'];
+        } else if (wave <= 20) {
+            // Waves 13-20: all types
+            return ['short', 'medium', 'long'];
+        } else {
+            // Waves 20+: all types but more hard ones
+            return ['short', 'medium', 'medium', 'long', 'long'];
+        }
+    }
+
     getWordListForType(type) {
+        // Get allowed word lengths for current wave
+        const allowedLengths = this.getWordListsByWave();
+        const selectedLength = allowedLengths[Math.floor(Math.random() * allowedLengths.length)];
+        
+        // Enemy type still influences word selection but within wave constraints
         switch (type) {
-            case 'fast': return WORD_LISTS.short;
-            case 'tank': return WORD_LISTS.medium; // Use normal length words for tank
-            case 'double': return WORD_LISTS.short; // Use short words for double HP enemies
-            default: return WORD_LISTS.medium;
+            case 'fast':
+                // Fast enemies prefer shorter words, but respect wave constraints
+                if (allowedLengths.includes('short')) {
+                    return WORD_LISTS.short;
+                } else if (allowedLengths.includes('medium')) {
+                    return WORD_LISTS.medium;
+                } else {
+                    return WORD_LISTS.long;
+                }
+            case 'double':
+                // Double HP enemies prefer shorter words for balance
+                if (allowedLengths.includes('short')) {
+                    return WORD_LISTS.short;
+                } else if (allowedLengths.includes('medium')) {
+                    return WORD_LISTS.medium;
+                } else {
+                    return WORD_LISTS.long;
+                }
+            default:
+                // Normal enemies use wave-based selection
+                return WORD_LISTS[selectedLength];
         }
     }
 
@@ -1347,9 +1390,16 @@ class TypeSlopGame {
         // Increment wave count when wave is completed
         this.gameState.wave++;
         
-        // Apply difficulty scaling
-        this.gameState.enemySpeedMultiplier *= 1.025;
-        this.gameState.spawnDelayMultiplier *= 0.985;
+        // Apply difficulty scaling with soft-cap curves
+        // Speed: base + wave * 0.02, capped at 2.0x
+        const baseSpeedMultiplier = 1.0;
+        const newSpeedMultiplier = Math.min(2.0, baseSpeedMultiplier + (this.gameState.wave * 0.02));
+        this.gameState.enemySpeedMultiplier = newSpeedMultiplier;
+        
+        // Spawn Delay: base - wave * 0.015, floored at 0.5x
+        const baseSpawnDelayMultiplier = 1.0;
+        const newSpawnDelayMultiplier = Math.max(0.5, baseSpawnDelayMultiplier - (this.gameState.wave * 0.015));
+        this.gameState.spawnDelayMultiplier = newSpawnDelayMultiplier;
         
         // Show upgrade screen
         this.showUpgradeScreen();
