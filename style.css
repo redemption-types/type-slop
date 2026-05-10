@@ -1031,8 +1031,8 @@ body::before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(8px, 1.5vh, 12px);
-    margin-bottom: clamp(12px, 2.5vh, 20px);
+    gap: clamp(4px, 1vh, 8px);
+    margin-bottom: clamp(8px, 1.5vh, 12px);
     animation: header-float 3s ease-in-out infinite;
     width: 100%;
     text-align: center;
@@ -1044,7 +1044,7 @@ body::before {
 }
 
 .upgrade-title-image {
-    max-width: clamp(180px, 32vw, 280px);
+    max-width: clamp(160px, 28vw, 240px);
     height: auto;
     filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
     animation: title-glow 2s ease-in-out infinite alternate;
@@ -1056,16 +1056,16 @@ body::before {
 }
 
 .upgrade-wave-counter {
-    font-size: clamp(11px, 2.2vw, 13px);
+    font-size: clamp(10px, 2vw, 12px);
     font-weight: 700;
     color: #333;
     text-shadow: none;
     transition: all 0.3s ease;
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    padding: clamp(5px, 1.2vh, 8px) clamp(12px, 3.5vw, 18px);
+    padding: clamp(4px, 1vh, 6px) clamp(10px, 3vw, 15px);
     border-radius: 15px;
     border: 2px solid rgba(255, 215, 0, 0.8);
-    min-width: clamp(110px, 22vw, 150px);
+    min-width: clamp(100px, 20vw, 140px);
     text-align: center;
     backdrop-filter: blur(15px);
     box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
@@ -1182,7 +1182,7 @@ body::before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(8px, 1.8vh, 16px);
+    gap: clamp(6px, 1.2vh, 12px);
     position: relative;
     width: 100%;
     max-width: 280px;
@@ -1514,8 +1514,8 @@ body::before {
     text-align: center;
     animation: fade-in 0.5s ease-out;
     margin-top: auto;
-    padding-top: 12px;
-    padding-bottom: 8px;
+    padding-top: 8px;
+    padding-bottom: 6px;
     flex-shrink: 0;
     min-height: fit-content;
 }
@@ -1526,8 +1526,8 @@ body::before {
 }
 
 .lootbox-result h3 {
-    font-size: clamp(14px, 2.8vw, 18px);
-    margin-bottom: 8px;
+    font-size: clamp(13px, 2.5vw, 16px);
+    margin-bottom: 6px;
     color: #FFD700;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
@@ -1540,7 +1540,7 @@ body::before {
     border: 3px solid #FFD700;
     border-radius: 16px;
     padding: 12px;
-    margin: 0 auto 15px;
+    margin: 0 auto 12px;
     text-align: center;
     backdrop-filter: blur(15px);
     box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
@@ -1571,7 +1571,7 @@ body::before {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
-    margin-top: 15px;
+    margin-top: 12px;
     flex-shrink: 0;
     min-height: fit-content;
     white-space: nowrap;
@@ -1596,23 +1596,23 @@ body::before {
     }
     
     .upgrade-header {
-        gap: clamp(8px, 1.5vh, 12px);
-        margin-bottom: clamp(10px, 2vh, 15px);
+        gap: clamp(3px, 0.8vh, 6px);
+        margin-bottom: clamp(6px, 1.2vh, 10px);
     }
     
     .upgrade-title-image {
-        max-width: clamp(150px, 30vw, 250px);
+        max-width: clamp(140px, 25vw, 220px);
     }
     
     .upgrade-wave-counter {
-        font-size: clamp(10px, 2vw, 12px);
-        padding: clamp(4px, 1vh, 8px) clamp(10px, 3vw, 15px);
-        min-width: clamp(100px, 20vw, 140px);
+        font-size: clamp(9px, 1.8vw, 11px);
+        padding: clamp(3px, 0.8vh, 5px) clamp(8px, 2.5vw, 12px);
+        min-width: clamp(90px, 18vw, 130px);
     }
     
     .lootbox-container {
         max-width: 260px;
-        gap: clamp(10px, 2vh, 18px);
+        gap: clamp(5px, 1vh, 10px);
     }
     
     .lootbox {
@@ -1637,21 +1637,21 @@ body::before {
         min-height: clamp(90px, 13vh, 130px);
         max-height: clamp(130px, 19vh, 160px);
         padding: 12px;
-        margin: 0 auto 18px;
+        margin: 0 auto 12px;
         overflow: hidden;
         word-wrap: break-word;
         hyphens: auto;
     }
     
     .lootbox-result h3 {
-        font-size: clamp(14px, 2.5vw, 18px);
-        margin-bottom: 10px;
+        font-size: clamp(12px, 2.2vw, 15px);
+        margin-bottom: 6px;
     }
     
     .continue-button {
-        padding: clamp(8px, 1.4vh, 12px) clamp(14px, 3.5vw, 22px);
-        font-size: clamp(11px, 2.2vw, 13px);
-        margin-top: 15px;
+        padding: clamp(7px, 1.3vh, 10px) clamp(14px, 3.5vw, 22px);
+        font-size: clamp(10px, 2vw, 12px);
+        margin-top: 10px;
         white-space: nowrap;
     }
 }
@@ -1665,12 +1665,12 @@ body::before {
     }
     
     .upgrade-header {
-        gap: clamp(5px, 1vh, 8px);
-        margin-bottom: clamp(8px, 1.5vh, 12px);
+        gap: clamp(2px, 0.6vh, 5px);
+        margin-bottom: clamp(5px, 1vh, 8px);
     }
     
     .lootbox-container {
-        gap: clamp(8px, 1.2vh, 12px);
+        gap: clamp(4px, 0.8vh, 8px);
     }
     
     .lootbox {
@@ -1687,6 +1687,7 @@ body::before {
         min-height: clamp(80px, 11vh, 110px);
         max-height: clamp(110px, 14vh, 130px);
         padding: 10px;
+        margin: 0 auto 10px;
         overflow: hidden;
         word-wrap: break-word;
         hyphens: auto;
@@ -1695,7 +1696,7 @@ body::before {
     .continue-button {
         padding: clamp(6px, 1.2vh, 10px) clamp(12px, 3vw, 18px);
         font-size: clamp(10px, 2vw, 12px);
-        margin-top: 12px;
+        margin-top: 8px;
         white-space: nowrap;
     }
 }
