@@ -880,6 +880,20 @@ body::before {
     text-align: center;
 }
 
+.game-over-typeslop-logo {
+    max-width: 180px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.8));
+    animation: game-over-logo-pulse 2s ease-in-out infinite;
+}
+
+@keyframes game-over-logo-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
 .game-over-logo {
     max-width: 300px;
     width: 100%;
