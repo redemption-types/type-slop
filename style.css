@@ -1492,10 +1492,33 @@ body::before {
     animation: particle-explode 1.5s ease-out forwards;
 }
 
+/* Nuke Particle Effects */
+.nuke-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: nuke-explode 1.5s ease-out forwards;
+}
+
 @keyframes particle-explode {
     0% {
         transform: translate(0, 0) scale(1);
         opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes nuke-explode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(1.5);
+        opacity: 0.8;
     }
     100% {
         transform: translate(var(--tx), var(--ty)) scale(0);
@@ -1710,39 +1733,60 @@ body::before {
 }
 
 .powerup.freeze {
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.9) 0%, rgba(41, 128, 185, 0.9) 100%);
-    border: 2px solid rgba(52, 152, 219, 1);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
-    animation: powerup-float 2s ease-in-out infinite, freeze-pulse 1.5s ease-in-out infinite;
+    animation: freeze-pulse 1s ease-in-out infinite;
+}
+
+.powerup.freeze::before {
+    content: '❄️ FREEZE';
+    font-size: 24px;
+    font-weight: bold;
+    color: #3498db;
+    text-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
+    text-align: center;
+    display: block;
 }
 
 @keyframes freeze-pulse {
-    0%, 100% { box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6); }
-    50% { box-shadow: 0 6px 30px rgba(52, 152, 219, 0.8); }
+    0%, 100% { }
+    50% { }
 }
 
 .powerup.nuke {
-    background: linear-gradient(135deg, rgba(231, 76, 60, 0.9) 0%, rgba(192, 57, 43, 0.9) 100%);
-    border: 2px solid rgba(231, 76, 60, 1);
-    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
-    animation: powerup-float 2s ease-in-out infinite, nuke-pulse 1s ease-in-out infinite;
+    animation: nuke-pulse 1s ease-in-out infinite;
+}
+
+.powerup.nuke::before {
+    content: '💣 NUKE';
+    font-size: 24px;
+    font-weight: bold;
+    color: #e74c3c;
+    text-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+    text-align: center;
+    display: block;
 }
 
 @keyframes nuke-pulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6); }
-    50% { transform: scale(1.1); box-shadow: 0 6px 30px rgba(231, 76, 60, 0.8); }
+    0%, 100% { }
+    50% { }
 }
 
 .powerup.heal {
-    background: linear-gradient(135deg, rgba(46, 204, 113, 0.9) 0%, rgba(39, 174, 96, 0.9) 100%);
-    border: 2px solid rgba(46, 204, 113, 1);
-    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
-    animation: powerup-float 2s ease-in-out infinite, heal-pulse 2s ease-in-out infinite;
+    animation: heal-pulse 2s ease-in-out infinite;
+}
+
+.powerup.heal::before {
+    content: '❤️ HEAL';
+    font-size: 24px;
+    font-weight: bold;
+    color: #2ecc71;
+    text-shadow: 0 0 20px rgba(46, 204, 113, 0.8);
+    text-align: center;
+    display: block;
 }
 
 @keyframes heal-pulse {
-    0%, 100% { box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6); }
-    50% { box-shadow: 0 6px 30px rgba(46, 204, 113, 0.8); }
+    0%, 100% { }
+    50% { }
 }
 
 @keyframes pulse {
@@ -1852,23 +1896,23 @@ body::before {
 @keyframes powerup-pulse {
     0% {
         opacity: 0;
-        transform: translateY(20px) scale(0.3) rotate(0deg);
+        transform: translateY(20px) scale(0.3);
     }
     25% {
         opacity: 1;
-        transform: translateY(-35px) scale(1.4) rotate(90deg);
+        transform: translateY(-35px) scale(1.4);
     }
     50% {
         opacity: 0.8;
-        transform: translateY(-50px) scale(1.2) rotate(180deg);
+        transform: translateY(-50px) scale(1.2);
     }
     75% {
         opacity: 0.4;
-        transform: translateY(-65px) scale(0.9) rotate(270deg);
+        transform: translateY(-65px) scale(0.9);
     }
     100% {
         opacity: 0;
-        transform: translateY(-80px) scale(0.5) rotate(360deg);
+        transform: translateY(-80px) scale(0.5);
     }
 }
 

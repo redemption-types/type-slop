@@ -537,7 +537,6 @@ class TypeSlopGame {
     }
 
     selectDifficulty(difficulty) {
-        console.log('selectDifficulty called with:', difficulty);
         this.currentDifficulty = difficulty;
         this.difficultySettings = DIFFICULTY_SETTINGS[difficulty];
         
@@ -551,26 +550,17 @@ class TypeSlopGame {
         if (selectedBtn) {
             selectedBtn.classList.add('active');
             selectedBtn.setAttribute('aria-checked', 'true');
-            console.log('Difficulty set to:', difficulty, 'Settings:', this.difficultySettings);
-        } else {
-            console.error('Could not find button for difficulty:', difficulty);
         }
     }
 
     init() {
         // Event listeners
         const startBtn = document.getElementById('start-btn');
-        console.log('Start button found:', startBtn);
         if (startBtn) {
             startBtn.addEventListener('click', (e) => {
-                console.log('=== START BUTTON CLICKED ===');
-                console.log('Current difficulty before start:', this.currentDifficulty);
-                console.log('Difficulty settings before start:', this.difficultySettings);
                 e.preventDefault();
                 this.startGame();
             });
-        } else {
-            console.error('Start button not found!');
         }
         document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
         document.getElementById('main-menu-btn').addEventListener('click', () => this.returnToMainMenu());
@@ -582,27 +572,14 @@ class TypeSlopGame {
         
         // Difficulty selection event listeners - using event delegation
         document.addEventListener('click', (e) => {
-            console.log('Document click detected, target:', e.target);
-            console.log('Target classes:', e.target.className);
-            
-            // Check if clicked element or its parent has difficulty-btn class
             const clickedBtn = e.target.closest('.difficulty-btn');
             if (clickedBtn) {
-                console.log('=== DIFFICULTY BUTTON CLICKED ===');
-                console.log('Clicked button:', clickedBtn);
-                console.log('Button dataset:', clickedBtn.dataset);
-                
                 e.preventDefault();
                 e.stopPropagation();
                 
                 const difficulty = clickedBtn.dataset.difficulty;
-                console.log('Difficulty extracted:', difficulty);
-                
                 if (difficulty) {
-                    console.log('Calling selectDifficulty with:', difficulty);
                     this.selectDifficulty(difficulty);
-                } else {
-                    console.error('No difficulty found on clicked element');
                 }
             }
         });
@@ -612,28 +589,9 @@ class TypeSlopGame {
         
         // Set global reference for enemy speed calculations
         window.game = this;
-        
-        // Debug: Test difficulty buttons manually
-        console.log('=== DEBUGGING DIFFICULTY BUTTONS ===');
-        console.log('Found difficulty buttons:', document.querySelectorAll('.difficulty-btn'));
-        document.querySelectorAll('.difficulty-btn').forEach((btn, index) => {
-            console.log(`Button ${index}:`, btn, 'Dataset:', btn.dataset);
-        });
-        
-        // Test manual difficulty setting
-        window.testDifficulty = (diff) => {
-            console.log('Manual test setting difficulty to:', diff);
-            this.selectDifficulty(diff);
-        };
     }
 
     startGame() {
-        console.log('=== START GAME CALLED ===');
-        console.log('Current difficulty:', this.currentDifficulty);
-        console.log('Difficulty settings:', this.difficultySettings);
-        console.log('Current enemies:', this.gameState.enemies.length);
-        console.log('Game running:', this.gameState.gameRunning);
-        
         // Hide all screens
         this.startScreen.classList.add('hidden');
         this.upgradeScreen.classList.add('hidden');
@@ -646,17 +604,10 @@ class TypeSlopGame {
         // Reset game state but preserve cheat status
         const previousCheatState = this.gameState.powerUpCheatActive;
         this.gameState = new GameState();
-        this.gameState.powerUpCheatActive = previousCheatState; // Preserve cheat state
+        this.gameState.powerUpCheatActive = previousCheatState;
         this.gameState.gameRunning = true;
         this.gameState.enemySpeedMultiplier = this.difficultySettings.enemySpeedMultiplier;
         this.gameState.spawnDelayMultiplier = this.difficultySettings.spawnDelayMultiplier;
-        
-        console.log('After reset - enemies:', this.gameState.enemies.length);
-        console.log('After reset - game running:', this.gameState.gameRunning);
-        console.log('Applied difficulty settings:', {
-            enemySpeedMultiplier: this.gameState.enemySpeedMultiplier,
-            spawnDelayMultiplier: this.gameState.spawnDelayMultiplier
-        });
         
         // Clear any timeouts
         if (this.slowMoTimeout) clearTimeout(this.slowMoTimeout);
@@ -708,13 +659,10 @@ class TypeSlopGame {
                       'fast', 'fast', // 20% fast
                       'double']; // 10% double HP enemies (replaced tank)
         
-        console.log(`Spawning ${count} enemies for wave ${this.gameState.wave}`);
-        
         // Mark that enemies are being spawned (with delay to prevent immediate completion)
         setTimeout(() => {
             this.gameState.waveEnemiesSpawned = true;
-            console.log('Wave enemies spawned flag set to true after delay');
-        }, 500); // 500ms delay before allowing wave completion
+        }, 500);
         
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
@@ -732,10 +680,7 @@ class TypeSlopGame {
                 // Mark that enemies have started spawning (only on first enemy)
                 if (i === 0) {
                     this.gameState.firstEnemySpawned = true;
-                    console.log('First enemy spawned, setting firstEnemySpawned to true');
                 }
-                
-                console.log(`Spawned enemy: ${word} (${type}) at position ${x}`);
             }, 1000 + i * 1000 * this.difficultySettings.spawnDelayMultiplier); // 1 second base delay + difficulty-adjusted intervals
         }
     }
@@ -779,8 +724,6 @@ class TypeSlopGame {
         
         enemy.element = element;
         this.enemiesContainer.appendChild(element);
-        
-        console.log(`Created enemy element: ${enemy.word} at ${enemy.x}, ${enemy.y}`);
     }
 
     handleTyping(e) {
@@ -837,6 +780,7 @@ class TypeSlopGame {
             // Increment enemies defeated counter
             this.gameState.enemiesDefeated++;
             this.updateEnemyDefeatedDisplay();
+            console.log('[DESTROY] Enemy destroyed. Enemies defeated:', this.gameState.enemiesDefeated);
             
             // Show combo popup
             if (this.gameState.combo > 0 && this.gameState.combo % 5 === 0) {
@@ -844,15 +788,10 @@ class TypeSlopGame {
             }
             
             // Chance to drop power-up
-            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.1; // 100% if cheat active, otherwise 10%
-            console.log('Enemy destroyed - powerUpCheatActive:', this.gameState.powerUpCheatActive, 'dropChance:', dropChance);
-            const randomRoll = Math.random();
-            console.log('Random roll:', randomRoll, 'vs dropChance:', dropChance);
-            if (randomRoll < dropChance) {
-                console.log('Dropping power-up at:', enemy.x, enemy.y);
+            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.1;
+            if (Math.random() < dropChance) {
+                console.log('[POWERUP] Dropping power-up from enemy:', enemy.word);
                 this.dropPowerUp(enemy.x, enemy.y);
-            } else {
-                console.log('No power-up dropped');
             }
         } else {
             // Enemy damaged but not destroyed
@@ -909,41 +848,43 @@ class TypeSlopGame {
     }
 
     dropPowerUp(x, y) {
-        console.log('=== dropPowerUp called ===');
-        console.log('Position:', x, y);
+        console.log('[POWERUP] Dropping power-up at position:', x, y);
         const types = ['freeze', 'nuke', 'heal'];
         const type = types[Math.floor(Math.random() * types.length)];
-        console.log('Power-up type selected:', type);
-        const powerUp = new PowerUp(type, x, y + 20); // Spawn 20px below enemy
+        console.log('[POWERUP] Type selected:', type);
+        const powerUp = new PowerUp(type, x, y + 20);
         this.gameState.powerUps.push(powerUp);
         this.createPowerUpElement(powerUp);
     }
 
     createPowerUpElement(powerUp) {
-        // Simple image element - no container div
-        const img = document.createElement('img');
-        img.src = powerUp.type === 'heal' ? '1up.png' : `${powerUp.type}.png`;
-        img.alt = powerUp.type;
-        img.style.position = 'absolute';
-        img.style.left = `${powerUp.x}px`;
-        img.style.top = `${powerUp.y}px`;
-        img.style.objectFit = 'contain';
-        img.style.pointerEvents = 'auto';
-        img.style.cursor = 'pointer';
-        img.style.zIndex = '100';
-        img.classList.add('powerup');
+        console.log('[POWERUP] Creating element for type:', powerUp.type, 'at position:', powerUp.x, powerUp.y);
+        // Create div element with CSS styling instead of image
+        const div = document.createElement('div');
+        div.className = `powerup ${powerUp.type}`;
+        div.style.position = 'absolute';
+        div.style.left = `${powerUp.x}px`;
+        div.style.top = `${powerUp.y}px`;
+        div.style.pointerEvents = 'none';
+        div.style.zIndex = '1000';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.justifyContent = 'center';
         
-        powerUp.element = img;
-        this.enemiesContainer.appendChild(img);
+        powerUp.element = div;
+        this.enemiesContainer.appendChild(div);
         
-        // Add click event to collect power-up
-        img.addEventListener('click', () => {
+        console.log('[POWERUP] Element appended to container. Container children:', this.enemiesContainer.children.length);
+        
+        // Auto-apply power-up immediately after a short delay (for visual feedback)
+        setTimeout(() => {
             if (this.gameState.gameRunning) {
+                console.log('[POWERUP] Auto-applying power-up:', powerUp.type);
                 this.collectPowerUp(powerUp);
             }
-        });
+        }, 500);
         
-        // Make powerup disappear after 3 seconds if not collected
+        // Make powerup disappear after 3 seconds if not collected (backup)
         setTimeout(() => {
             if (powerUp.element && powerUp.element.parentNode) {
                 powerUp.element.style.opacity = '0';
@@ -1092,9 +1033,8 @@ class TypeSlopGame {
     }
 
     activatePowerUpCheat() {
-        console.log('=== CHEAT ACTIVATED ===');
+        console.log('[CHEAT] Power-up cheat activated');
         this.gameState.powerUpCheatActive = true;
-        console.log('powerUpCheatActive set to:', this.gameState.powerUpCheatActive);
         
         // Show cheat activation message
         const cheatMessage = document.createElement('div');
@@ -1193,13 +1133,6 @@ class TypeSlopGame {
         
         // Check wave completion - only if enemies have been spawned and all are destroyed
         if (this.gameState.enemies.length === 0 && this.gameState.gameRunning && this.gameState.waveEnemiesSpawned && this.gameState.firstEnemySpawned) {
-            console.log('GAME LOOP: Checking wave completion');
-            console.log('Enemies length:', this.gameState.enemies.length);
-            console.log('Game running:', this.gameState.gameRunning);
-            console.log('Wave completed flag:', this.gameState.waveCompleted);
-            console.log('Wave enemies spawned flag:', this.gameState.waveEnemiesSpawned);
-            console.log('First enemy spawned flag:', this.gameState.firstEnemySpawned);
-            console.log('Current wave:', this.gameState.wave);
             this.completeWave();
         }
         
@@ -1223,6 +1156,7 @@ class TypeSlopGame {
     }
 
     collectPowerUp(powerUp) {
+        console.log('[POWERUP] Collecting power-up:', powerUp.type, 'at position:', powerUp.x, powerUp.y);
         this.gameState.powerUps = this.gameState.powerUps.filter(p => p.id !== powerUp.id);
         powerUp.element.remove();
         
@@ -1231,79 +1165,104 @@ class TypeSlopGame {
         
         switch (powerUp.type) {
             case 'freeze':
+                console.log('[POWERUP] Activating FREEZE effect');
                 this.freezeEnemies();
                 break;
             case 'nuke':
+                console.log('[POWERUP] Activating NUKE effect');
                 this.nukeNearestEnemy();
                 break;
             case 'heal':
+                console.log('[POWERUP] Activating HEAL effect');
                 this.healPlayer();
                 break;
         }
     }
 
     freezeEnemies() {
-        // Show countdown effect
-        this.showPowerUpEffect('freeze', '3...');
+        console.log('[FREEZE] Freezing', this.gameState.enemies.length, 'enemies for 3 seconds');
+        // Store current speeds before freezing
+        const enemySpeeds = new Map();
+        this.gameState.enemies.forEach(enemy => {
+            enemySpeeds.set(enemy.id, enemy.speed);
+        });
         
-        setTimeout(() => {
-            this.showPowerUpEffect('freeze', '2...');
-        }, 500);
-        
-        setTimeout(() => {
-            this.showPowerUpEffect('freeze', '1...');
-        }, 1000);
-        
-        setTimeout(() => {
-            this.showPowerUpEffect('freeze', 'FREEZE!');
-            this.gameState.enemies.forEach(enemy => {
-                enemy.speed = 0;
-                enemy.element.style.filter = 'hue-rotate(200deg) brightness(1.5)';
-                
-                setTimeout(() => {
-                    enemy.speed = enemy.getBaseSpeed();
-                    enemy.element.style.filter = '';
-                }, 1000);
-            });
-        }, 1500);
+        // Freeze immediately
+        console.log('[FREEZE] Applying freeze effect to enemies');
+        // this.showPowerUpEffect('freeze', 'FREEZE!');
+        this.gameState.enemies.forEach(enemy => {
+            console.log('[FREEZE] Setting enemy speed to 0:', enemy.word);
+            enemy.speed = 0;
+            enemy.element.style.filter = 'hue-rotate(200deg) brightness(1.5)';
+            
+            setTimeout(() => {
+                console.log('[FREEZE] Restoring enemy speed:', enemy.word);
+                enemy.speed = enemySpeeds.get(enemy.id) || enemy.getBaseSpeed();
+                enemy.element.style.filter = '';
+            }, 3000);
+        });
     }
 
     nukeNearestEnemy() {
-        if (this.gameState.enemies.length === 0) return;
+        console.log('[NUKE] Enemies on screen:', this.gameState.enemies.length);
+        if (this.gameState.enemies.length === 0) {
+            console.log('[NUKE] No enemies to nuke');
+            return;
+        }
         
         const nearestEnemy = this.gameState.enemies.reduce((nearest, enemy) => {
             return enemy.y > nearest.y ? enemy : nearest;
         });
         
+        console.log('[NUKE] Targeting enemy:', nearestEnemy.word, 'at Y:', nearestEnemy.y);
         // Show nuke effect at enemy position
-        this.showPowerUpEffect('nuke', '💥', nearestEnemy.x, nearestEnemy.y);
+        // this.showPowerUpEffect('nuke', '💥', nearestEnemy.x, nearestEnemy.y);
         
         setTimeout(() => {
-            this.destroyEnemy(nearestEnemy);
+            console.log('[NUKE] Destroying enemy:', nearestEnemy.word);
+            
+            // Check if enemy still exists in the array
+            const enemyExists = this.gameState.enemies.includes(nearestEnemy);
+            console.log('[NUKE] Enemy still exists in array:', enemyExists);
+            
+            if (enemyExists) {
+                // Create nuke explosion at enemy position before destroying
+                const explosionX = nearestEnemy.x + nearestEnemy.element.offsetWidth / 2;
+                const explosionY = nearestEnemy.y + nearestEnemy.element.offsetHeight / 2;
+                this.createNukeExplosion(explosionX, explosionY);
+                
+                this.destroyEnemy(nearestEnemy);
+                console.log('[NUKE] Enemies defeated after nuke:', this.gameState.enemiesDefeated);
+            } else {
+                console.log('[NUKE] Enemy was already destroyed, skipping');
+            }
         }, 300);
     }
 
     healPlayer() {
-        this.showPowerUpEffect('heal', '+1❤️');
+        console.log('[HEAL] Current lives:', this.gameState.lives, 'Max lives:', this.gameState.maxLives);
+        // this.showPowerUpEffect('heal', '+1❤️');
         
         setTimeout(() => {
+            const oldLives = this.gameState.lives;
             this.gameState.lives = Math.min(this.gameState.lives + 1, this.gameState.maxLives);
+            console.log('[HEAL] Lives changed from', oldLives, 'to', this.gameState.lives);
             this.updateUI();
+            
+            // Also update the lives display directly to ensure it updates
+            if (this.livesDisplay) {
+                this.livesDisplay.textContent = this.gameState.lives;
+                console.log('[HEAL] Directly updated lives display to:', this.gameState.lives);
+            }
         }, 500);
     }
 
     completeWave() {
-        console.log('=== COMPLETE WAVE CALLED ===');
-        console.log('Wave completed flag before check:', this.gameState.waveCompleted);
-        
         // Prevent multiple calls to completeWave
         if (this.gameState.waveCompleted) {
-            console.log('Wave already completed, returning early');
             return;
         }
         this.gameState.waveCompleted = true;
-        
-        console.log('Setting game running to false');
         this.gameState.gameRunning = false;
         
         // Increment wave count when wave is completed
@@ -1313,14 +1272,11 @@ class TypeSlopGame {
         this.gameState.enemySpeedMultiplier *= 1.03;
         this.gameState.spawnDelayMultiplier *= 0.98;
         
-        console.log('About to show upgrade screen');
         // Show upgrade screen
         this.showUpgradeScreen();
     }
 
     showUpgradeScreen() {
-        console.log('=== SHOW UPGRADE SCREEN CALLED ===');
-        
         // Pause game
         this.gameState.gameRunning = false;
         
@@ -1460,6 +1416,50 @@ class TypeSlopGame {
             
             // Remove particle after animation
             setTimeout(() => particle.remove(), 2000);
+        }
+    }
+
+    createNukeExplosion(x, y) {
+        // Create explosion particles at enemy position
+        const particleCount = 25;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'nuke-particle';
+            
+            // Orange/red explosion colors
+            const colors = ['#FF4500', '#FF6347', '#FF8C00', '#FFD700', '#FFFF00', '#FF0000'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.style.backgroundColor = color;
+            particle.style.boxShadow = `0 0 8px ${color}`;
+            
+            // Random size for variety
+            const size = Math.random() * 10 + 6;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Calculate random explosion direction
+            const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.3;
+            const velocity = Math.random() * 250 + 150;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            // Position at enemy center
+            particle.style.position = 'absolute';
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.transform = 'translate(-50%, -50%)';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1000';
+            
+            this.enemiesContainer.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => particle.remove(), 1500);
         }
     }
 
