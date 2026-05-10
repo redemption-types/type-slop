@@ -1257,7 +1257,7 @@ body::before {
 
 .lootbox-prompt {
     position: absolute;
-    bottom: -40px;
+    bottom: -60px;
     left: 50%;
     transform: translateX(-50%);
     font-size: clamp(10px, 2vw, 12px);
@@ -1265,28 +1265,28 @@ body::before {
     color: #FFD700;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 215, 0, 0.6);
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 140, 0, 0.2) 100%);
+    background: transparent;
     padding: 6px 12px;
-    border: 2px solid rgba(255, 215, 0, 0.5);
-    border-radius: 12px;
-    z-index: 10;
+    border: none;
+    border-radius: 0;
+    z-index: 15;
     pointer-events: none;
     animation: prompt-pulse 2s ease-in-out infinite;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    white-space: normal;
+    white-space: nowrap;
     text-align: center;
     line-height: 1.2;
+    min-width: 120px;
 }
 
 @keyframes prompt-pulse {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.05); }
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
 }
 
 .lootbox.opening .lootbox-prompt {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translateX(-50%) scale(0.5);
     pointer-events: none;
 }
 

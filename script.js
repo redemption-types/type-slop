@@ -389,14 +389,14 @@ class Lootbox {
         
         // Animate to final centered position
         setTimeout(() => {
-            track.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
+            track.style.transition = 'transform 2s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
             track.style.transform = `translateX(${finalPosition}px)`;
         }, 50);
     }
 
     async waitForAnimation() {
         return new Promise(resolve => {
-            setTimeout(resolve, 4000); // 4 seconds for CSGO-style animation
+            setTimeout(resolve, 750); // 0.75 seconds for CSGO-style animation
         });
     }
 
@@ -1122,6 +1122,15 @@ class TypeSlopGame {
             e.preventDefault();
             this.typingInput.value = '';
             this.clearEnemyHighlights();
+        }
+        
+        // Open lootbox with 'P' key (when upgrade screen is active)
+        if (e.key.toLowerCase() === 'p' && !this.upgradeScreen.classList.contains('hidden')) {
+            e.preventDefault();
+            const lootboxElement = document.getElementById('lootbox');
+            if (lootboxElement && !lootboxElement.classList.contains('opening')) {
+                this.openLootbox();
+            }
         }
         
         // Cheat code detection (when input is not focused)
