@@ -614,7 +614,7 @@ body::before {
     justify-content: flex-start;
     align-items: center;
     z-index: 3000;
-    padding: 10px;
+    padding: 42px 17px 17px 17px;
     overflow-y: auto;
     max-height: 100vh;
     box-sizing: border-box;
@@ -625,8 +625,8 @@ body::before {
 }
 
 #start-screen h1 {
-    font-size: clamp(22px, 4vw, 36px);
-    margin-bottom: clamp(4px, 0.8vh, 8px);
+    font-size: clamp(15px, 2.5vw, 24px);
+    margin-bottom: clamp(4px, 0.4vh, 7px);
     margin-top: 0px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     -webkit-background-clip: text;
@@ -644,11 +644,12 @@ body::before {
 }
 
 .title-logo {
-    max-width: clamp(400px, 55vw, 700px);
-    max-height: clamp(160px, 22vh, 280px);
+    max-width: clamp(300px, 34vw, 425px);
+    max-height: clamp(120px, 15vh, 170px);
     width: 100%;
     height: auto;
-    margin-bottom: clamp(8px, 1.5vh, 15px);
+    margin-bottom: clamp(8px, 1vh, 12px);
+    margin-top: 5px;
     animation: title-pulse 3s ease-in-out infinite;
     filter: drop-shadow(0 0 40px rgba(102, 126, 234, 1));
     transition: all 0.3s ease;
@@ -661,12 +662,12 @@ body::before {
 }
 
 .alien-menu-image {
-    max-width: clamp(150px, 25vw, 250px);
-    max-height: clamp(80px, 12vh, 120px);
+    max-width: clamp(85px, 10vw, 128px);
+    max-height: clamp(42px, 6vh, 64px);
     width: 100%;
     height: auto;
-    margin: clamp(0px, 0.2vh, 3px) 0;
-    margin-bottom: 8px;
+    margin: 0;
+    margin-bottom: 5px;
     animation: alien-float 4s ease-in-out infinite;
     filter: drop-shadow(0 0 20px rgba(0, 255, 127, 0.6));
     transition: all 0.3s ease;
@@ -699,8 +700,8 @@ body::before {
 }
 
 #start-screen p {
-    margin: clamp(4px, 0.8vh, 8px) 0;
-    font-size: clamp(10px, 1.8vw, 14px);
+    margin: clamp(4px, 0.7vh, 7px) 0;
+    font-size: clamp(12px, 1.8vw, 16px);
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     letter-spacing: 0.5px;
@@ -708,17 +709,15 @@ body::before {
 }
 
 .game-rules {
-    margin: clamp(4px, 1vh, 8px) 0;
+    margin: clamp(10px, 1.5vh, 15px) 0;
     text-align: center;
-    max-width: clamp(350px, 70vw, 550px);
+    max-width: clamp(380px, 64vw, 550px);
     background: var(--glass-bg);
-    padding: clamp(8px, 1.2vh, 10px);
+    padding: clamp(13px, 1.7vh, 17px);
     border-radius: 20px;
     border: 1px solid var(--glass-border);
-    overflow: visible;
     backdrop-filter: blur(20px) saturate(180%);
     box-shadow: var(--glass-shadow);
-    max-height: none;
     flex-shrink: 0;
 }
 
@@ -727,8 +726,8 @@ body::before {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: clamp(4px, 0.8vh, 6px);
-    font-size: clamp(16px, 3.5vw, 20px);
+    margin-bottom: clamp(7px, 0.85.85.80.80.80.80vh0 10px);
+    font-size: clamp(12px, 1.9vw, 15px);
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -736,16 +735,16 @@ body::before {
 .game-rules ul {
     list-style: none;
     padding: 0;
-    margin-bottom: clamp(6px, 1.2vh, 10px);
+    margin-bottom: clamp(10px, 1.3vh, 13px);
 }
 
 .game-rules li {
-    margin: clamp(2px, 0.5vh, 4px) 0;
-    padding-left: 20px;
+    margin: clamp(3px, 0.4vh, 5px) 0;
+    padding-left: 17px;
     position: relative;
-    font-size: clamp(9px, 1.8vw, 11px);
+    font-size: clamp(1111111p555555444444px);
     color: rgba(255, 255, 255, 0.85);
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
 .game-rules li::before {
@@ -763,9 +762,9 @@ body::before {
 .powerup-legend {
     display: flex;
     flex-direction: column;
-    gap: clamp(4px, 0.8vh, 6px);
-    margin-top: clamp(4px, 0.8vh, 6px);
-    padding: clamp(4px, 0.8vh, 6px);
+    gap: clamp(8px, 1vh, 12px);
+    margin-top: clamp(12px, 1.5vh, 15px);
+    padding: clamp(10px, 1.5vh, 15px);
     background: rgba(0,0,0,0.3);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -774,27 +773,27 @@ body::before {
 .powerup-item {
     display: flex;
     align-items: center;
-    gap: clamp(8px, 1.5vw, 12px);
-    padding: clamp(4px, 0.8vh, 6px);
+    gap: clamp(10px, 1.5vw, 15px);
+    padding: clamp(6px, 0.8vh, 10px);
     background: rgba(0,0,0,0.2);
     border-radius: 8px;
 }
 
 .powerup-emoji {
-    font-size: clamp(12px, 2.2vw, 18px);
-    width: clamp(14px, 2.5vw, 20px);
+    font-size: clamp(15px, 2.4vw, 20px);
+    width: clamp(17px, 2.5vw, 24px);
     text-align: center;
 }
 
 .powerup-image {
-    width: clamp(40px, 6vw, 60px);
-    height: clamp(40px, 6vw, 60px);
+    width: clamp(30px, 4.2vw, 42px);
+    height: clamp(30px, 4.2vw, 42px);
     object-fit: contain;
 }
 
 .powerup-desc {
     color: #fff;
-    font-size: clamp(9px, 1.8vw, 12px);
+    font-size: clamp(9px, 1.3vw, 12px);
     line-height: 1.2;
     font-weight: 500;
 }
@@ -802,9 +801,9 @@ body::before {
 .enemy-legend {
     display: flex;
     flex-direction: column;
-    gap: clamp(4px, 0.8vh, 6px);
-    margin-top: clamp(4px, 0.8vh, 6px);
-    padding: clamp(4px, 0.8vh, 6px);
+    gap: clamp(7px, 0.85vh, 10px);
+    margin-top: clamp(10px, 1.3vh, 13px);
+    padding: clamp(8px, 1.3vh, 13px);
     background: rgba(0,0,0,0.3);
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -813,18 +812,18 @@ body::before {
 .enemy-item {
     display: flex;
     align-items: center;
-    gap: clamp(8px, 1.5vw, 12px);
-    padding: clamp(4px, 0.8vh, 6px);
+    gap: clamp(8px, 1.3vw, 13px);
+    padding: clamp(5px, 0.7vh, 8px);
     background: rgba(0,0,0,0.2);
     border-radius: 8px;
 }
 
 .enemy-preview {
-    min-width: clamp(50px, 7vw, 70px);
-    padding: clamp(3px, 0.6vh, 4px) clamp(6px, 1.2vw, 8px);
+    min-width: clamp(42px, 6vw, 60px);
+    padding: clamp(3px, 0.5vh, 5px) clamp(7px, 1vw, 10px);
     border-radius: 8px;
     font-weight: bold;
-    font-size: clamp(8px, 1.5vw, 10px);
+    font-size: clamp(8px, 1.2vw, 11px);
     text-align: center;
     color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -860,13 +859,13 @@ body::before {
 
 .enemy-desc {
     color: #fff;
-    font-size: clamp(9px, 1.8vw, 12px);
+    font-size: clamp(9px, 1.3vw, 12px);
     line-height: 1.2;
     font-weight: 500;
 }
 
 .difficulty-selection {
-    margin: clamp(8px, 1.5vh, 15px) 0;
+    margin: clamp(8px, 1.3vh, 13px) 0;
     text-align: center;
 }
 
@@ -875,21 +874,21 @@ body::before {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: clamp(8px, 1.5vh, 12px);
-    font-size: clamp(14px, 3vw, 18px);
+    margin-bottom: clamp(7px, 0.85vh, 10px);
+    font-size: clamp(12px, 1.7vw, 15px);
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 .difficulty-options {
     display: flex;
-    gap: clamp(10px, 2vw, 15px);
+    gap: clamp(10px, 1.7vw, 15px);
     justify-content: center;
 }
 
 .difficulty-btn {
-    padding: clamp(10px, 2vh, 12px) clamp(20px, 4vw, 24px);
-    font-size: clamp(14px, 3vw, 18px);
+    padding: clamp(7px, 1vh, 10px) clamp(15px, 2.5vw, 20px);
+    font-size: clamp(12px, 1.8vw, 16px);
     font-weight: 600;
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
@@ -1894,20 +1893,20 @@ body::before {
     background: var(--glass-bg);
     color: var(--text-primary);
     border: 1px solid var(--glass-border);
-    padding: clamp(10px, 2vh, 14px) clamp(20px, 4vw, 28px);
-    font-size: clamp(14px, 2.5vw, 18px);
+    padding: clamp(12px, 2.1vh, 17px) clamp(25px, 4.2vw, 34px);
+    font-size: clamp(15px, 2.5vw, 20px);
     font-weight: 600;
     border-radius: 16px;
     cursor: pointer;
-    margin-top: clamp(15px, 3vh, 20px);
+    margin-top: clamp(17px, 2.5vh, 21px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     letter-spacing: 0.025em;
     box-shadow: var(--glass-shadow);
     position: relative;
     overflow: hidden;
     z-index: 10;
-    min-height: 45px;
-    min-width: 140px;
+    min-height: 47px;
+    min-width: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
