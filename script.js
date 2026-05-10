@@ -491,7 +491,7 @@ const DIFFICULTY_SETTINGS = {
     },
     hard: {
         enemySpeedMultiplier: 1.3,  // 30% faster
-        spawnDelayMultiplier: 0.8,   // 20% faster spawning
+        spawnDelayMultiplier: 0.85,   // 15% faster spawning
         enemySpeedBonus: 1.3,
         fastSpeedBonus: 1.3,
         tankSpeedBonus: 1.3,
@@ -656,27 +656,50 @@ class TypeSlopGame {
         this.gameState.firstEnemySpawned = false;
         this.gameState.enemiesDefeated = 0;
         
-        const enemyCount = 5 + this.gameState.wave;
+        const enemyCount = Math.floor(10 + (this.gameState.wave * 1.5));
         this.gameState.totalEnemiesInWave = enemyCount;
         this.spawnWaveEnemies(enemyCount);
         this.updateEnemyDefeatedDisplay();
     }
 
     spawnWaveEnemies(count) {
-        const types = ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', // 70% normal
-                      'fast', 'fast', // 20% fast
-                      'double']; // 10% double HP enemies (replaced tank)
+        // Calculate batch count: 1 + floor(wave / 5), capped at 4
+        const batchCount = Math.min(4, 1 + Math.floor(this.gameState.wave / 5));
+        
+        // Distribute enemies across batches (roughly equal)
+        const enemiesPerBatch = Math.ceil(count / batchCount);
+        let remainingEnemies = count;
         
         // Mark that enemies are being spawned (with delay to prevent immediate completion)
         setTimeout(() => {
             this.gameState.waveEnemiesSpawned = true;
         }, 500);
         
-        for (let i = 0; i < count; i++) {
+        // Spawn batches sequentially
+        for (let batchIndex = 0; batchIndex < batchCount; batchIndex++) {
+            const batchSize = Math.min(enemiesPerBatch, remainingEnemies);
+            remainingEnemies -= batchSize;
+            
+            // Delay between batches (1-2 seconds)
+            const batchDelay = batchIndex * (1000 + Math.random() * 1000);
+            
+            setTimeout(() => {
+                if (!this.gameState.gameRunning) return;
+                this.spawnBatch(batchSize, batchIndex, batchCount);
+            }, batchDelay);
+        }
+    }
+
+    spawnBatch(batchSize, batchIndex, totalBatches) {
+        // Create different enemy type mixes for each batch
+        const batchTypes = this.getBatchEnemyTypes(batchIndex, totalBatches);
+        
+        // Spawn enemies in this batch
+        for (let i = 0; i < batchSize; i++) {
             setTimeout(() => {
                 if (!this.gameState.gameRunning) return;
                 
-                const type = types[Math.floor(Math.random() * types.length)];
+                const type = batchTypes[Math.floor(Math.random() * batchTypes.length)];
                 const wordList = this.getWordListForType(type);
                 const word = wordList[Math.floor(Math.random() * wordList.length)];
                 const x = Math.random() * (this.gameArea.offsetWidth - 100);
@@ -685,11 +708,36 @@ class TypeSlopGame {
                 this.gameState.enemies.push(enemy);
                 this.createEnemyElement(enemy);
                 
-                // Mark that enemies have started spawning (only on first enemy)
-                if (i === 0) {
+                // Mark that enemies have started spawning (only on first enemy of first batch)
+                if (batchIndex === 0 && i === 0) {
                     this.gameState.firstEnemySpawned = true;
                 }
-            }, 1000 + i * 1000 * this.difficultySettings.spawnDelayMultiplier); // 1 second base delay + difficulty-adjusted intervals
+            }, i * 800 * this.difficultySettings.spawnDelayMultiplier); // Faster spawning within batches
+        }
+    }
+
+    getBatchEnemyTypes(batchIndex, totalBatches) {
+        // Create variety in enemy type distribution per batch
+        const wave = this.gameState.wave;
+        
+        if (totalBatches === 1) {
+            // Single batch: standard mix
+            return ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
+                    'fast', 'fast', 'double'];
+        }
+        
+        if (batchIndex === 0) {
+            // First batch: mostly normal, some fast
+            return ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
+                    'fast', 'fast'];
+        } else if (batchIndex === totalBatches - 1) {
+            // Last batch: more challenging mix
+            return ['normal', 'normal', 'normal', 'normal', 'normal',
+                    'fast', 'fast', 'fast', 'double', 'double'];
+        } else {
+            // Middle batches: balanced mix
+            return ['normal', 'normal', 'normal', 'normal', 'normal', 'normal',
+                    'fast', 'fast', 'double'];
         }
     }
 
@@ -1255,15 +1303,9 @@ class TypeSlopGame {
         // Show nuke effect at enemy position
         // this.showPowerUpEffect('nuke', '💥', nearestEnemy.x, nearestEnemy.y);
         
+        // Delay the destruction to show the explosion effect
         setTimeout(() => {
-            console.log('[NUKE] Destroying enemy:', nearestEnemy.word);
-            
-            // Check if enemy still exists in the array
-            const enemyExists = this.gameState.enemies.includes(nearestEnemy);
-            console.log('[NUKE] Enemy still exists in array:', enemyExists);
-            
-            if (enemyExists) {
-                // Create nuke explosion at enemy position before destroying
+            if (this.gameState.enemies.includes(nearestEnemy)) {
                 const explosionX = nearestEnemy.x + nearestEnemy.element.offsetWidth / 2;
                 const explosionY = nearestEnemy.y + nearestEnemy.element.offsetHeight / 2;
                 this.createNukeExplosion(explosionX, explosionY);
@@ -1306,8 +1348,8 @@ class TypeSlopGame {
         this.gameState.wave++;
         
         // Apply difficulty scaling
-        this.gameState.enemySpeedMultiplier *= 1.03;
-        this.gameState.spawnDelayMultiplier *= 0.98;
+        this.gameState.enemySpeedMultiplier *= 1.025;
+        this.gameState.spawnDelayMultiplier *= 0.985;
         
         // Show upgrade screen
         this.showUpgradeScreen();
@@ -1346,7 +1388,7 @@ class TypeSlopGame {
         setTimeout(() => {
             this.upgradeScreen.classList.remove('hidden');
             this.screenBackdrop.classList.remove('hidden');
-        }, 2500); // 2.5 second delay to ensure all animations complete
+        }, 1500); // 1.5 second delay to ensure all animations complete
     }
 
     resetLootboxUI() {
