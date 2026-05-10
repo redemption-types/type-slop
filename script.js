@@ -1043,6 +1043,13 @@ class TypeSlopGame {
             this.activateSlowMo();
         }
         
+        // Clear input with Escape key
+        if (e.code === 'Escape' && this.gameState.gameRunning) {
+            e.preventDefault();
+            this.typingInput.value = '';
+            this.clearEnemyHighlights();
+        }
+        
         // Cheat code detection (only on start screen)
         if (!this.startScreen.classList.contains('hidden')) {
             if (e.key.length === 1) {
