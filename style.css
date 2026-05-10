@@ -1692,8 +1692,8 @@ body::before {
 /* Power-ups */
 .powerup {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 160px;
+    height: 160px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2080,8 +2080,8 @@ body::before {
     }
     
     .powerup {
-        width: 40px;
-        height: 40px;
+        width: 80px;
+        height: 80px;
         font-size: 20px;
     }
     
@@ -2144,8 +2144,8 @@ body::before {
     }
     
     .powerup {
-        width: 35px;
-        height: 35px;
+        width: 70px;
+        height: 70px;
         font-size: 18px;
     }
     

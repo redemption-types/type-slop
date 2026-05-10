@@ -607,8 +607,8 @@ class TypeSlopGame {
             }
         });
         
-        // Focus input on load
-        this.typingInput.focus();
+        // Focus input only when game starts, not on load
+        // this.typingInput.focus();
         
         // Set global reference for enemy speed calculations
         window.game = this;
@@ -643,8 +643,10 @@ class TypeSlopGame {
         // Clear any existing enemies and power-ups
         this.enemiesContainer.innerHTML = '';
         
-        // Reset game state
+        // Reset game state but preserve cheat status
+        const previousCheatState = this.gameState.powerUpCheatActive;
         this.gameState = new GameState();
+        this.gameState.powerUpCheatActive = previousCheatState; // Preserve cheat state
         this.gameState.gameRunning = true;
         this.gameState.enemySpeedMultiplier = this.difficultySettings.enemySpeedMultiplier;
         this.gameState.spawnDelayMultiplier = this.difficultySettings.spawnDelayMultiplier;
@@ -666,6 +668,9 @@ class TypeSlopGame {
         this.updateUI();
         this.startWave();
         this.gameLoop();
+        
+        // Focus input immediately when game starts
+        this.typingInput.focus();
     }
 
     restartGame() {
@@ -673,7 +678,8 @@ class TypeSlopGame {
         this.screenBackdrop.classList.add('hidden');
         this.typingInput.value = '';
         this.startGame();
-        this.typingInput.focus();
+        // Focus input only after game starts
+        setTimeout(() => this.typingInput.focus(), 100);
     }
 
     returnToMainMenu() {
@@ -681,7 +687,7 @@ class TypeSlopGame {
         this.screenBackdrop.classList.add('hidden');
         this.startScreen.classList.remove('hidden');
         this.typingInput.value = '';
-        this.typingInput.focus();
+        // Don't focus input on main menu - remove auto-focus
     }
 
     startWave() {
@@ -839,8 +845,14 @@ class TypeSlopGame {
             
             // Chance to drop power-up
             const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.1; // 100% if cheat active, otherwise 10%
-            if (Math.random() < dropChance) {
+            console.log('Enemy destroyed - powerUpCheatActive:', this.gameState.powerUpCheatActive, 'dropChance:', dropChance);
+            const randomRoll = Math.random();
+            console.log('Random roll:', randomRoll, 'vs dropChance:', dropChance);
+            if (randomRoll < dropChance) {
+                console.log('Dropping power-up at:', enemy.x, enemy.y);
                 this.dropPowerUp(enemy.x, enemy.y);
+            } else {
+                console.log('No power-up dropped');
             }
         } else {
             // Enemy damaged but not destroyed
@@ -897,8 +909,11 @@ class TypeSlopGame {
     }
 
     dropPowerUp(x, y) {
+        console.log('=== dropPowerUp called ===');
+        console.log('Position:', x, y);
         const types = ['freeze', 'nuke', 'heal'];
         const type = types[Math.floor(Math.random() * types.length)];
+        console.log('Power-up type selected:', type);
         const powerUp = new PowerUp(type, x, y + 20); // Spawn 20px below enemy
         this.gameState.powerUps.push(powerUp);
         this.createPowerUpElement(powerUp);
@@ -910,18 +925,25 @@ class TypeSlopGame {
         img.src = powerUp.type === 'heal' ? '1up.png' : `${powerUp.type}.png`;
         img.alt = powerUp.type;
         img.style.position = 'absolute';
-        img.style.width = '300px';
-        img.style.height = '300px';
         img.style.left = `${powerUp.x}px`;
         img.style.top = `${powerUp.y}px`;
         img.style.objectFit = 'contain';
-        img.style.pointerEvents = 'none';
+        img.style.pointerEvents = 'auto';
+        img.style.cursor = 'pointer';
         img.style.zIndex = '100';
+        img.classList.add('powerup');
         
         powerUp.element = img;
         this.enemiesContainer.appendChild(img);
         
-        // Make powerup disappear after 2 seconds if not collected
+        // Add click event to collect power-up
+        img.addEventListener('click', () => {
+            if (this.gameState.gameRunning) {
+                this.collectPowerUp(powerUp);
+            }
+        });
+        
+        // Make powerup disappear after 3 seconds if not collected
         setTimeout(() => {
             if (powerUp.element && powerUp.element.parentNode) {
                 powerUp.element.style.opacity = '0';
@@ -933,7 +955,7 @@ class TypeSlopGame {
                     }
                 }, 300);
             }
-        }, 2000);
+        }, 3000);
     }
 
     showLoseLifeImage(x, y) {
@@ -1038,7 +1060,7 @@ class TypeSlopGame {
     }
 
     handleKeyDown(e) {
-        if (e.code === 'Space' && this.gameState.slowMoReady && !this.gameState.slowMoActive) {
+        if (e.code === 'Space' && this.gameState.slowMoReady && !this.gameState.slowMoActive && this.gameState.gameRunning) {
             e.preventDefault();
             this.activateSlowMo();
         }
@@ -1050,8 +1072,8 @@ class TypeSlopGame {
             this.clearEnemyHighlights();
         }
         
-        // Cheat code detection (only on start screen)
-        if (!this.startScreen.classList.contains('hidden')) {
+        // Cheat code detection (when input is not focused)
+        if (document.activeElement !== this.typingInput) {
             if (e.key.length === 1) {
                 this.cheatCodeBuffer += e.key.toLowerCase();
                 
@@ -1070,7 +1092,9 @@ class TypeSlopGame {
     }
 
     activatePowerUpCheat() {
+        console.log('=== CHEAT ACTIVATED ===');
         this.gameState.powerUpCheatActive = true;
+        console.log('powerUpCheatActive set to:', this.gameState.powerUpCheatActive);
         
         // Show cheat activation message
         const cheatMessage = document.createElement('div');
@@ -1491,8 +1515,8 @@ class TypeSlopGame {
             this.startWave();
             this.gameLoop();
             
-            // Focus the typing input
-            this.typingInput.focus();
+            // Focus the typing input only when game resumes
+            setTimeout(() => this.typingInput.focus(), 100);
             
             // Clear current upgrade
             this.currentUpgrade = null;
