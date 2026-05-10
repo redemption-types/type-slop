@@ -48,6 +48,8 @@ class GameState {
         this.enemiesDefeated = 0;
         this.totalEnemiesInWave = 0;
         this.powerUpCheatActive = false; // Easter egg: 100% power-up drops
+        this.freezeActive = false;
+        this.freezeEndTime = 0;
     }
 }
 
@@ -724,6 +726,13 @@ class TypeSlopGame {
         
         enemy.element = element;
         this.enemiesContainer.appendChild(element);
+        
+        // Apply freeze effect if freeze is currently active
+        if (this.gameState.freezeActive) {
+            console.log('[FREEZE] Applying freeze to newly spawned enemy:', enemy.word);
+            enemy.speed = 0;
+            enemy.element.style.filter = 'hue-rotate(200deg) brightness(1.5)';
+        }
     }
 
     handleTyping(e) {
@@ -1181,6 +1190,11 @@ class TypeSlopGame {
 
     freezeEnemies() {
         console.log('[FREEZE] Freezing', this.gameState.enemies.length, 'enemies for 3 seconds');
+        
+        // Set freeze state
+        this.gameState.freezeActive = true;
+        this.gameState.freezeEndTime = Date.now() + 3000;
+        
         // Store current speeds before freezing
         const enemySpeeds = new Map();
         this.gameState.enemies.forEach(enemy => {
@@ -1194,12 +1208,24 @@ class TypeSlopGame {
             console.log('[FREEZE] Setting enemy speed to 0:', enemy.word);
             enemy.speed = 0;
             enemy.element.style.filter = 'hue-rotate(200deg) brightness(1.5)';
-            
-            setTimeout(() => {
-                console.log('[FREEZE] Restoring enemy speed:', enemy.word);
-                enemy.speed = enemySpeeds.get(enemy.id) || enemy.getBaseSpeed();
-                enemy.element.style.filter = '';
-            }, 3000);
+        });
+        
+        // Set timeout to end freeze
+        setTimeout(() => {
+            this.endFreeze(enemySpeeds);
+        }, 3000);
+    }
+
+    endFreeze(enemySpeeds) {
+        console.log('[FREEZE] Ending freeze for all enemies');
+        this.gameState.freezeActive = false;
+        this.gameState.freezeEndTime = 0;
+        
+        // Restore speeds for all current enemies
+        this.gameState.enemies.forEach(enemy => {
+            console.log('[FREEZE] Restoring enemy speed:', enemy.word);
+            enemy.speed = enemySpeeds.get(enemy.id) || enemy.getBaseSpeed();
+            enemy.element.style.filter = '';
         });
     }
 
