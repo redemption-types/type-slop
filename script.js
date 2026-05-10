@@ -47,6 +47,7 @@ class GameState {
         this.firstEnemySpawned = false;
         this.enemiesDefeated = 0;
         this.totalEnemiesInWave = 0;
+        this.powerUpCheatActive = false; // Easter egg: 100% power-up drops
     }
 }
 
@@ -528,6 +529,10 @@ class TypeSlopGame {
         this.lootbox = new Lootbox();
         this.currentUpgrade = null;
         
+        // Cheat code tracking
+        this.cheatCodeBuffer = '';
+        this.targetCheatCode = 'black sheep wall';
+        
         this.init();
     }
 
@@ -833,7 +838,8 @@ class TypeSlopGame {
             }
             
             // Chance to drop power-up
-            if (Math.random() < 0.1) { // 10% chance
+            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.1; // 100% if cheat active, otherwise 10%
+            if (Math.random() < dropChance) {
                 this.dropPowerUp(enemy.x, enemy.y);
             }
         } else {
@@ -899,29 +905,35 @@ class TypeSlopGame {
     }
 
     createPowerUpElement(powerUp) {
-        const element = document.createElement('div');
-        element.className = `powerup ${powerUp.type}`;
+        // Simple image element - no container div
+        const img = document.createElement('img');
+        img.src = `${powerUp.type}.png`;
+        img.alt = powerUp.type;
+        img.style.position = 'absolute';
+        img.style.width = '80px';
+        img.style.height = '80px';
+        img.style.left = `${powerUp.x}px`;
+        img.style.top = `${powerUp.y}px`;
+        img.style.objectFit = 'contain';
+        img.style.pointerEvents = 'none';
+        img.style.zIndex = '100';
         
-        // Use emojis for power-ups
-        let emoji = '';
-        switch (powerUp.type) {
-            case 'freeze':
-                emoji = '❄️';
-                break;
-            case 'nuke':
-                emoji = '💣';
-                break;
-            case 'heal':
-                emoji = '❤️';
-                break;
-        }
+        powerUp.element = img;
+        this.enemiesContainer.appendChild(img);
         
-        element.textContent = emoji;
-        element.style.left = `${powerUp.x}px`;
-        element.style.top = `${powerUp.y}px`;
-        
-        powerUp.element = element;
-        this.enemiesContainer.appendChild(element);
+        // Make powerup disappear after 2 seconds if not collected
+        setTimeout(() => {
+            if (powerUp.element && powerUp.element.parentNode) {
+                powerUp.element.style.opacity = '0';
+                powerUp.element.style.transition = 'opacity 0.3s ease-out';
+                setTimeout(() => {
+                    if (powerUp.element && powerUp.element.parentNode) {
+                        powerUp.element.remove();
+                        this.gameState.powerUps = this.gameState.powerUps.filter(p => p.id !== powerUp.id);
+                    }
+                }, 300);
+            }
+        }, 2000);
     }
 
     showLoseLifeImage(x, y) {
@@ -954,13 +966,13 @@ class TypeSlopGame {
         let text = '';
         switch (type) {
             case 'freeze':
-                text = 'FREEZE!';
+                text = '❄️ FREEZE!';
                 break;
             case 'nuke':
-                text = 'NUKE!';
+                text = '💣 NUKE!';
                 break;
             case 'heal':
-                text = 'HEAL!';
+                text = '❤️ HEAL!';
                 break;
         }
         
@@ -969,7 +981,35 @@ class TypeSlopGame {
         popup.style.top = `${y}px`;
         
         this.enemiesContainer.appendChild(popup);
-        setTimeout(() => popup.remove(), 1500);
+        setTimeout(() => popup.remove(), 1000);
+    }
+
+    showPowerUpEffect(type, text, x = null, y = null) {
+        const effect = document.createElement('div');
+        effect.className = `powerup-effect ${type}`;
+        
+        // Position at center of game area if no specific position given
+        if (x === null || y === null) {
+            x = this.gameArea.offsetWidth / 2;
+            y = this.gameArea.offsetHeight / 2;
+        }
+        
+        effect.textContent = text;
+        effect.style.left = `${x}px`;
+        effect.style.top = `${y}px`;
+        effect.style.transform = 'translate(-50%, -50%)';
+        
+        this.enemiesContainer.appendChild(effect);
+        
+        // Fade out and remove
+        setTimeout(() => {
+            effect.style.opacity = '0';
+            effect.style.transition = 'opacity 0.5s ease-out';
+        }, 100);
+        
+        setTimeout(() => {
+            effect.remove();
+        }, 600);
     }
 
     showWordExplosion(enemy) {
@@ -1042,6 +1082,71 @@ class TypeSlopGame {
             e.preventDefault();
             this.activateSlowMo();
         }
+        
+        // Cheat code detection (only on start screen)
+        if (!this.startScreen.classList.contains('hidden')) {
+            if (e.key.length === 1) {
+                this.cheatCodeBuffer += e.key.toLowerCase();
+                
+                // Check if the buffer contains the cheat code
+                if (this.cheatCodeBuffer.includes(this.targetCheatCode)) {
+                    this.activatePowerUpCheat();
+                    this.cheatCodeBuffer = '';
+                }
+                
+                // Keep buffer manageable (last 50 characters)
+                if (this.cheatCodeBuffer.length > 50) {
+                    this.cheatCodeBuffer = this.cheatCodeBuffer.slice(-50);
+                }
+            }
+        }
+    }
+
+    activatePowerUpCheat() {
+        this.gameState.powerUpCheatActive = true;
+        
+        // Show cheat activation message
+        const cheatMessage = document.createElement('div');
+        cheatMessage.className = 'cheat-message';
+        cheatMessage.textContent = '100% upgrades enabled';
+        cheatMessage.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 10000;
+            animation: cheatPulse 2s ease-in-out;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        `;
+        
+        // Add animation keyframes if not exists
+        if (!document.querySelector('#cheat-animation')) {
+            const style = document.createElement('style');
+            style.id = 'cheat-animation';
+            style.textContent = `
+                @keyframes cheatPulse {
+                    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+                    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(cheatMessage);
+        
+        // Remove message after 3 seconds
+        setTimeout(() => {
+            cheatMessage.style.opacity = '0';
+            cheatMessage.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => cheatMessage.remove(), 500);
+        }, 3000);
     }
 
     activateSlowMo() {
@@ -1092,16 +1197,8 @@ class TypeSlopGame {
             }
         });
         
-        // Update power-up positions
-        this.gameState.powerUps.forEach(powerUp => {
-            powerUp.y += 1;
-            powerUp.element.style.top = `${powerUp.y}px`;
-            
-            // Check if power-up reached player line (collect earlier to prevent falling off)
-            if (powerUp.y > this.gameArea.offsetHeight - 80) {
-                this.collectPowerUp(powerUp);
-            }
-        });
+        // Update power-up positions - remove falling behavior
+        // Powerups now stay in place and disappear after timeout
         
         // Check wave completion - only if enemies have been spawned and all are destroyed
         if (this.gameState.enemies.length === 0 && this.gameState.gameRunning && this.gameState.waveEnemiesSpawned && this.gameState.firstEnemySpawned) {
@@ -1155,12 +1252,29 @@ class TypeSlopGame {
     }
 
     freezeEnemies() {
-        this.gameState.enemies.forEach(enemy => {
-            enemy.speed = 0;
-            setTimeout(() => {
-                enemy.speed = enemy.getBaseSpeed();
-            }, 1000);
-        });
+        // Show countdown effect
+        this.showPowerUpEffect('freeze', '3...');
+        
+        setTimeout(() => {
+            this.showPowerUpEffect('freeze', '2...');
+        }, 500);
+        
+        setTimeout(() => {
+            this.showPowerUpEffect('freeze', '1...');
+        }, 1000);
+        
+        setTimeout(() => {
+            this.showPowerUpEffect('freeze', 'FREEZE!');
+            this.gameState.enemies.forEach(enemy => {
+                enemy.speed = 0;
+                enemy.element.style.filter = 'hue-rotate(200deg) brightness(1.5)';
+                
+                setTimeout(() => {
+                    enemy.speed = enemy.getBaseSpeed();
+                    enemy.element.style.filter = '';
+                }, 1000);
+            });
+        }, 1500);
     }
 
     nukeNearestEnemy() {
@@ -1170,12 +1284,21 @@ class TypeSlopGame {
             return enemy.y > nearest.y ? enemy : nearest;
         });
         
-        this.destroyEnemy(nearestEnemy);
+        // Show nuke effect at enemy position
+        this.showPowerUpEffect('nuke', '💥', nearestEnemy.x, nearestEnemy.y);
+        
+        setTimeout(() => {
+            this.destroyEnemy(nearestEnemy);
+        }, 300);
     }
 
     healPlayer() {
-        this.gameState.lives = Math.min(this.gameState.lives + 1, this.gameState.maxLives);
-        this.updateUI();
+        this.showPowerUpEffect('heal', '+1❤️');
+        
+        setTimeout(() => {
+            this.gameState.lives = Math.min(this.gameState.lives + 1, this.gameState.maxLives);
+            this.updateUI();
+        }, 500);
     }
 
     completeWave() {
