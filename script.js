@@ -1333,7 +1333,6 @@ class TypeSlopGame {
         // Wait for animations to complete before showing upgrade screen
         // Word explosion animations last 2300ms, add extra buffer for safety
         setTimeout(() => {
-            console.log('Removing hidden class from upgrade screen after delay');
             this.upgradeScreen.classList.remove('hidden');
             this.screenBackdrop.classList.remove('hidden');
         }, 2500); // 2.5 second delay to ensure all animations complete
