@@ -152,21 +152,17 @@ body::before {
 }
 
 .slowmo-title {
-    font-size: 10px;
+    font-size: 14px;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 0 8px rgba(102, 126, 234, 0.8), 1px 1px 2px rgba(0,0,0,0.8);
     letter-spacing: 1px;
-    background: linear-gradient(135deg, #667eea, #f093fb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     animation: slowmo-title-pulse 2s ease-in-out infinite;
 }
 
 @keyframes slowmo-title-pulse {
-    0%, 100% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
 }
 
 #slowmo-bar {
@@ -184,43 +180,21 @@ body::before {
 
 #slowmo-bar:hover {
     border-color: rgba(102, 126, 234, 0.8);
-    box-shadow: 0 0 30px rgba(102, 126, 234, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+    transform: scale(1.02);
 }
 
 #slowmo-fill {
     height: 100%;
-    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
-    background-size: 300% 100%;
+    background: #667eea;
     width: 100%;
     transition: width 0.3s ease;
-    animation: slowmo-gradient-flow 3s ease-in-out infinite;
-    box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
     position: relative;
 }
 
-#slowmo-fill::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: slowmo-shine 2s ease-in-out infinite;
-}
 
-@keyframes slowmo-gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
 
-@keyframes slowmo-shine {
-    0% { left: -100%; }
-    50% { left: 100%; }
-    100% { left: 100%; }
-}
 
 #slowmo-text {
     position: absolute;
@@ -232,16 +206,12 @@ body::before {
     color: #fff;
     text-shadow: 0 0 8px rgba(102, 126, 234, 0.8), 1px 1px 2px rgba(0,0,0,0.8);
     letter-spacing: 1px;
-    background: linear-gradient(135deg, #667eea, #f093fb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     animation: slowmo-text-pulse 2s ease-in-out infinite;
 }
 
 @keyframes slowmo-text-pulse {
     0%, 100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
 }
 
 /* Game Area */
@@ -475,6 +445,26 @@ body::before {
 @keyframes damage-flash {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
+}
+
+@keyframes happy-bounce {
+    0% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-8px) scale(1.1); }
+    50% { transform: translateY(-12px) scale(1.15); }
+    75% { transform: translateY(-6px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes happy-glow {
+    0% { filter: brightness(1) hue-rotate(0deg); }
+    25% { filter: brightness(1.3) hue-rotate(10deg); }
+    50% { filter: brightness(1.5) hue-rotate(20deg); }
+    75% { filter: brightness(1.2) hue-rotate(10deg); }
+    100% { filter: brightness(1) hue-rotate(0deg); }
+}
+
+.enemy.double.happy-damaged {
+    animation: happy-bounce 0.6s ease-out, happy-glow 0.6s ease-out;
 }
 
 /* Input Area */
@@ -2021,18 +2011,14 @@ body::before {
 
 /* Enhanced slow-mo effect */
 .slowmo-active {
-    animation: slowmo-pulse 0.5s infinite, slowmo-hue-rotate 2s linear infinite;
+    animation: slowmo-pulse 1s infinite;
 }
 
 @keyframes slowmo-pulse {
     0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.2); }
+    50% { filter: brightness(1.1); }
 }
 
-@keyframes slowmo-hue-rotate {
-    0% { filter: hue-rotate(0deg) saturate(1.2); }
-    100% { filter: hue-rotate(360deg) saturate(1.2); }
-}
 
 /* Combo effect */
 .combo-popup {

@@ -1,25 +1,31 @@
 // Word Lists categorized by length
 const WORD_LISTS = {
-    short: [ // 3-5 letters for fast enemies
-        'tooth', 'gum', 'bite', 'ache', 'mint', 'floss', 'cusp', 'root', 'crown', 'drill',
-        'prep', 'etch', 'seal', 'pain', 'numb', 'snap', 'chip', 'pull', 'oral', 'jaw',
-        'molar', 'ridge', 'paste', 'brush', 'rinse', 'probe', 'scrub', 'clean', 'fresh'
-    ],
-    medium: [ // 4-7 letters for normal enemies
-        'enamel', 'dentin', 'canine', 'molar', 'occlus', 'gingiva',
-        'plaque', 'tartar', 'scaler', 'polish', 'cement', 'matrix', 'rubber',
-        'damper', 'suture', 'abscess', 'lesion', 'filling', 'caries', 'decay',
-        'bonding', 'etchant', 'bursize', 'impress', 'digital', 'scanner', 'xray', 'sensor',
-        'saliva', 'tongue', 'buccal', 'lingual', 'mesial', 'distal', 'apical', 'coronal'
-    ],
-    long: [ // 8-12 letters for tank enemies
-        'periodontal', 'endodontics', 'orthodontic', 'prosthodont', 'hygienist',
-        'malocclusion', 'radiograph', 'anesthesia', 'temporomand', 'implantology',
-        'debridement', 'fluoridation', 'osseointegr', 'pathologist', 'maxillofac',
-        'biocompat', 'articulation', 'sterilizer', 'amalgamation', 'odontogenic',
-        'periapical', 'gingivectomy', 'odontoplasty', 'occlusogram'
-    ]
-};
+  "short": [
+    "tooth", "gum", "bite", "ache", "floss", "cusp", "root", "crown", "drill",
+    "etch", "seal", "numb", "chip", "oral", "jaw", "paste", "probe", "clean",
+    "pulp", "rinse",
+    "tray", "bib", "sink", "mask", "gown", "lamp", "chair", "mold", "xray", "cap"
+  ],
+  "medium": [
+    "enamel", "dentin", "canine", "gingiva", "plaque", "tartar", "scaler",
+    "polish", "cement", "matrix", "rubber", "suture", "abscess", "lesion",
+    "filling", "caries", "decay", "bonding", "etchant", "scanner", "saliva",
+    "buccal", "lingual", "mesial", "distal", "apical", "coronal", "frenum",
+    "cavity",
+    "denture", "braces", "retainer", "suction", "forceps", "mirror", "syringe",
+    "bracket", "bridge", "implants", "bicuspid", "incisor", "molars", "patient"
+  ],
+  "long": [
+    "periodontal", "endodontics", "orthodontic", "prosthodont", "hygienist",
+    "malocclusion", "radiograph", "anesthesia", "implantology", "debridement",
+    "fluoridation", "osseointegr", "pathologist", "maxillofac", "articulation",
+    "sterilizer", "amalgamation", "odontogenic", "periapical", "gingivectomy",
+    "odontoplasty", "periodontitis", "amelogenesis",
+    "receptionist", "appointment", "sterilization", "panoramic", "whitening",
+    "extraction", "inflammation", "consultation", "restoration", "orthodontist"
+  ]
+}
+
 
 
 // Game State
@@ -75,7 +81,7 @@ class Enemy {
         switch (this.type) {
             case 'fast': return baseSpeed * 1.5 * (game ? game.difficultySettings.fastSpeedBonus : 1);
             case 'tank': return baseSpeed * 0.8 * (game ? game.difficultySettings.tankSpeedBonus : 1);
-            case 'double': return baseSpeed * 1.2 * (game ? game.difficultySettings.doubleSpeedBonus : 1);
+            case 'double': return baseSpeed * 0.8 * (game ? game.difficultySettings.doubleSpeedBonus : 1);
             default: return baseSpeed * (game ? game.difficultySettings.enemySpeedBonus : 1);
         }
     }
@@ -804,8 +810,13 @@ class TypeSlopGame {
             }
         } else {
             // Enemy damaged but not destroyed
-            enemy.element.classList.add('damaged');
-            setTimeout(() => enemy.element.classList.remove('damaged'), 300);
+            if (enemy.type === 'double') {
+                enemy.element.classList.add('happy-damaged');
+                setTimeout(() => enemy.element.classList.remove('happy-damaged'), 600);
+            } else {
+                enemy.element.classList.add('damaged');
+                setTimeout(() => enemy.element.classList.remove('damaged'), 300);
+            }
             
             // Update enemy text to show new HP or word change
             if (enemy.type === 'tank') {
@@ -1010,7 +1021,7 @@ class TypeSlopGame {
     }
 
     handleKeyDown(e) {
-        if (e.code === 'Space' && this.gameState.slowMoReady && !this.gameState.slowMoActive && this.gameState.gameRunning) {
+        if (e.ctrlKey && e.code === 'Space' && this.gameState.slowMoReady && !this.gameState.slowMoActive && this.gameState.gameRunning) {
             e.preventDefault();
             this.activateSlowMo();
         }
