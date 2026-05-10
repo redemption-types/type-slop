@@ -907,11 +907,11 @@ class TypeSlopGame {
     createPowerUpElement(powerUp) {
         // Simple image element - no container div
         const img = document.createElement('img');
-        img.src = `${powerUp.type}.png`;
+        img.src = powerUp.type === 'heal' ? '1up.png' : `${powerUp.type}.png`;
         img.alt = powerUp.type;
         img.style.position = 'absolute';
-        img.style.width = '80px';
-        img.style.height = '80px';
+        img.style.width = '300px';
+        img.style.height = '300px';
         img.style.left = `${powerUp.x}px`;
         img.style.top = `${powerUp.y}px`;
         img.style.objectFit = 'contain';
@@ -1030,47 +1030,7 @@ class TypeSlopGame {
         wordText.textContent = enemy.word;
         explosion.appendChild(wordText);
         
-        // Create white particles (delayed)
-        const particleCount = 12;
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            // Random direction for each particle
-            const angle = (Math.PI * 2 * i) / particleCount;
-            const distance = 50 + Math.random() * 50; // 50-100px
-            const tx = Math.cos(angle) * distance;
-            const ty = Math.sin(angle) * distance;
-            
-            particle.style.setProperty('--tx', `${tx}px`);
-            particle.style.setProperty('--ty', `${ty}px`);
-            
-            explosion.appendChild(particle);
-        }
-        
-        // Create additional dramatic white particle explosion
-        const whiteParticleCount = 20;
-        for (let i = 0; i < whiteParticleCount; i++) {
-            const whiteParticle = document.createElement('div');
-            whiteParticle.className = 'white-particle';
-            
-            // More explosive and random directions
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 80 + Math.random() * 120; // 80-200px for more dramatic effect
-            const tx = Math.cos(angle) * distance;
-            const ty = Math.sin(angle) * distance;
-            
-            whiteParticle.style.setProperty('--tx', `${tx}px`);
-            whiteParticle.style.setProperty('--ty', `${ty}px`);
-            
-            // Random size variation for more dynamic effect
-            const size = 4 + Math.random() * 8; // 4-12px
-            whiteParticle.style.width = `${size}px`;
-            whiteParticle.style.height = `${size}px`;
-            
-            explosion.appendChild(whiteParticle);
-        }
-        
+                
         this.enemiesContainer.appendChild(explosion);
         
         // Remove explosion after animation
@@ -1357,9 +1317,13 @@ class TypeSlopGame {
         // Add click listener for opening
         lootboxElement.addEventListener('click', () => this.openLootbox(), { once: true });
         
-        console.log('Removing hidden class from upgrade screen');
-        this.upgradeScreen.classList.remove('hidden');
-        this.screenBackdrop.classList.remove('hidden');
+        // Wait for animations to complete before showing upgrade screen
+        // Word explosion animations last 2300ms, add extra buffer for safety
+        setTimeout(() => {
+            console.log('Removing hidden class from upgrade screen after delay');
+            this.upgradeScreen.classList.remove('hidden');
+            this.screenBackdrop.classList.remove('hidden');
+        }, 2500); // 2.5 second delay to ensure all animations complete
     }
 
     resetLootboxUI() {
