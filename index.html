@@ -88,17 +88,31 @@
         
         <!-- Game Over Screen -->
         <section id="game-over-screen" class="hidden" role="dialog" aria-labelledby="game-over-title" aria-modal="true">
-            <div class="game-over-content">
+            <div class="game-over-header">
                 <img src="larger-logo.png" alt="TypeSlop Logo" class="game-over-typeslop-logo">
                 <img src="game-over-final.png" alt="GAME OVER" class="game-over-logo" id="game-over-title">
+            </div>
+            <div class="game-over-body">
                 <div class="game-over-stats">
-                    <p>Final Score: <span id="final-score">0</span></p>
-                    <p>Waves Survived: <span id="final-wave">0</span></p>
+                    <div class="stat-item">
+                        <span class="stat-label">Final Score:</span>
+                        <span class="stat-value" id="final-score">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Waves Survived:</span>
+                        <span class="stat-value" id="final-wave">0</span>
+                    </div>
                 </div>
-                <div class="game-over-options">
-                    <button id="restart-btn" class="game-over-btn restart-btn" aria-label="Restart the game">Restart?</button>
-                    <button id="main-menu-btn" class="game-over-btn main-menu-btn" aria-label="Return to main menu">Main Menu</button>
+                <div class="dental-facts-section">
+                    <h3 class="dental-facts-title">Fun Dental Fact!</h3>
+                    <div class="dental-fact-content" id="dental-fact">
+                        Loading fact...
+                    </div>
                 </div>
+            </div>
+            <div class="game-over-footer">
+                <button id="restart-btn" class="game-over-btn restart-btn" aria-label="Restart the game">Restart?</button>
+                <button id="main-menu-btn" class="game-over-btn main-menu-btn" aria-label="Return to main menu">Main Menu</button>
             </div>
         </section>
 

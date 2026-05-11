@@ -26,7 +26,39 @@ const WORD_LISTS = {
   ]
 }
 
-
+// Fun Dental Facts
+const DENTAL_FACTS = [
+    "The average person spends 38.5 days brushing their teeth over their lifetime!",
+    "Tooth enamel is the hardest substance in the human body - even harder than bone!",
+    "Your teeth are unique to you, just like your fingerprints. No two sets are the same!",
+    "The ancient Egyptians used a form of toothpaste made from ox hooves, myrrh, and eggshells.",
+    "Dental floss was first invented in 1815 by a New Orleans dentist named Levi Spear Parmly.",
+    "The world's oldest known recipe for toothpaste dates back to 4th century AD Egypt.",
+    "About 25% of adults don't brush their teeth twice a day as recommended by dentists.",
+    "The first toothbrushes with bristles were used in China around 1498, made from hog hair!",
+    "Your mouth produces over 25,000 quarts of saliva in your lifetime - enough to fill two swimming pools!",
+    "The average person has 32 teeth, but some people are born with extra teeth called supernumerary teeth.",
+    "Tooth decay is the second most common disease after the common cold!",
+    "The first dental school in the world opened in Baltimore in 1840.",
+    "Ancient Romans used urine as mouthwash because it contains ammonia which cleans teeth!",
+    "Baby teeth start forming when the baby is still in the womb, but don't appear until 6-12 months after birth.",
+    "The tooth fairy tradition dates back to early European traditions where a tooth was buried to protect the child from witches.",
+    "Dental plaque contains more than 300 different species of bacteria!",
+    "The first modern dental drill was powered by a foot pedal and invented in 1864.",
+    "George Washington had dentures made from gold, ivory, lead, and human and animal teeth!",
+    "The first toothpaste in a tube was introduced in 1892 by Dr. Washington Sheffield.",
+    "Dental X-rays were discovered by accident in 1895 when Wilhelm Conrad Roentgen was experimenting with cathode rays.",
+    "The average toothbrush has about 2,500 bristles grouped into 40 tufts.",
+    "Toothbrush bristles were made from boar hair until nylon was invented in 1938.",
+    "The first dental floss patent was granted in 1874 to Asa B. Stoddard.",
+    "Dental caries (cavities) have been found in prehistoric human remains dating back over 1 million years!",
+    "The first female dentist in America was Emeline Roberts Jones, who started practicing in 1855.",
+    "Ancient Greeks used a mixture of iron rust and coral powder to clean their teeth.",
+    "The world's largest collection of human teeth is over 1,000 teeth and belongs to a dentist in India!",
+    "Dental anesthesia was first used in 1844 by Dr. Horace Wells using nitrous oxide.",
+    "The first electric toothbrush was invented in 1939 but wasn't sold to the public until 1960.",
+    "Your teeth can tell scientists about your diet, health, and even where you grew up!"
+];
 
 // Game State
 class GameState {
@@ -2267,6 +2299,11 @@ class TypeSlopGame {
         
         document.getElementById('final-score').textContent = this.gameState.score;
         document.getElementById('final-wave').textContent = this.gameState.wave;
+        
+        // Display a random dental fact
+        const randomFact = DENTAL_FACTS[Math.floor(Math.random() * DENTAL_FACTS.length)];
+        document.getElementById('dental-fact').textContent = randomFact;
+        
         this.gameOverScreen.classList.remove('hidden');
         this.screenBackdrop.classList.remove('hidden');
     }
