@@ -57,7 +57,25 @@ const DENTAL_FACTS = [
     "The world's largest collection of human teeth is over 1,000 teeth and belongs to a dentist in India!",
     "Dental anesthesia was first used in 1844 by Dr. Horace Wells using nitrous oxide.",
     "The first electric toothbrush was invented in 1939 but wasn't sold to the public until 1960.",
-    "Your teeth can tell scientists about your diet, health, and even where you grew up!"
+    "Your teeth can tell scientists about your diet, health, and even where you grew up!",
+    "Sharks lose and regrow teeth constantly, going through up to 30,000 teeth in a lifetime!",
+    "A mosquito actually has 47 microscopic 'teeth' called denticles!",
+    "Giraffes don't have any upper front teeth. They use their tough lips and long tongues to grab leaves.",
+    "Snails have mouths no larger than a pinhead, but they can pack over 25,000 microscopic teeth!",
+    "An elephant's tusks are actually giant incisor teeth that keep growing for their entire life.",
+    "Adult dogs have 42 teeth, cats have 30, and pigs have 44!",
+    "Hippos have the longest canine teeth of any land animal, which can grow up to 20 inches long!",
+    "Cotton candy was actually co-invented by a dentist named William Morrison in 1897!",
+    "Just like your fingerprints, everyone has a completely unique tongue print!",
+    "If a permanent tooth gets knocked out, you can sometimes save it by keeping it submerged in a glass of milk until you see a dentist.",
+    "For thousands of years, people mistakenly believed that a tiny 'tooth worm' crawling inside the tooth caused cavities.",
+    "Eating cheese at the end of a meal can actually help prevent cavities by neutralizing the acids in your mouth.",
+    "Right-handed people tend to chew their food on the right side of their mouths, while left-handed people usually chew on the left.",
+    "Smiling is a workout! It takes up to 53 muscles to smile, but many of those are shared with the muscles used to chew.",
+    "The tongue is the only muscle in the human body that is attached at only one end.",
+    "Your teeth start to form before you are even born!",
+    "The plaque on your teeth is a 'biofilm,' which is very similar to the slippery slime you might feel on a rock in a river.",
+    "A dry mouth can lead to more cavities, which is why saliva is your mouth's best natural defense against tooth decay!"
 ];
 
 // Game State
@@ -85,6 +103,7 @@ class GameState {
         this.firstEnemySpawned = false;
         this.enemiesDefeated = 0;
         this.totalEnemiesInWave = 0;
+        this.enemiesEscaped = 0; // Track enemies that reached bottom
         this.powerUpCheatActive = false; // Easter egg: 100% power-up drops
         this.freezeActive = false;
         this.freezeEndTime = 0;
@@ -136,12 +155,12 @@ class Enemy {
         this.speed = this.getBaseSpeed();
         this.element = null;
         this.originalWord = word;
-        this.spawnDelay = 500; // 0.5 second delay before starting to fall
+        this.spawnDelay = 150; // 0.15 second delay before starting to fall
         this.spawnTime = Date.now(); // Track when this enemy was spawned
     }
 
     getBaseSpeed() {
-        const baseSpeed = 1; // pixels per frame
+        const baseSpeed = 0.7; // pixels per frame (reduced by 30%)
         const game = window.game; // Reference to game instance for difficulty
         
         switch (this.type) {
@@ -735,25 +754,25 @@ class Lootbox {
 // Difficulty Settings
 const DIFFICULTY_SETTINGS = {
     easy: {
-        enemySpeedMultiplier: 0.7,  // 30% slower
-        spawnDelayMultiplier: 1.3,   // 30% slower spawning
-        enemySpeedBonus: 0.7,
-        fastSpeedBonus: 0.7,
-        doubleSpeedBonus: 0.7
+        enemySpeedMultiplier: 0.6,  // 40% slower
+        spawnDelayMultiplier: 1.4,   // 40% slower spawning
+        enemySpeedBonus: 0.6,
+        fastSpeedBonus: 0.6,
+        doubleSpeedBonus: 0.6
     },
     medium: {
-        enemySpeedMultiplier: 1.0,  // Normal speed
-        spawnDelayMultiplier: 1.0,   // Normal spawning
-        enemySpeedBonus: 1.0,
-        fastSpeedBonus: 1.0,
-        doubleSpeedBonus: 1.0
+        enemySpeedMultiplier: 0.6,  // 40% slower
+        spawnDelayMultiplier: 1.4,   // 40% slower spawning
+        enemySpeedBonus: 0.6,
+        fastSpeedBonus: 0.6,
+        doubleSpeedBonus: 0.6
     },
     hard: {
-        enemySpeedMultiplier: 1.3,  // 30% faster
-        spawnDelayMultiplier: 0.85,   // 15% faster spawning
-        enemySpeedBonus: 1.3,
-        fastSpeedBonus: 1.3,
-        doubleSpeedBonus: 1.3
+        enemySpeedMultiplier: 0.8,  // 20% slower (was 30% faster, now 40% easier total)
+        spawnDelayMultiplier: 1.2,   // 20% slower spawning (was 15% faster, now 40% easier total)
+        enemySpeedBonus: 0.8,
+        fastSpeedBonus: 0.8,
+        doubleSpeedBonus: 0.8
     }
 };
 
@@ -916,11 +935,15 @@ class TypeSlopGame {
     }
 
     startWave() {
+        console.log(`[WAVE] ===== Starting Wave ${this.gameState.wave} =====`);
+        console.log(`[WAVE] Previous wave stats - Defeated: ${this.gameState.enemiesDefeated}, Escaped: ${this.gameState.enemiesEscaped}`);
+        
         // Reset wave flags
         this.gameState.waveCompleted = false;
         this.gameState.waveEnemiesSpawned = false;
         this.gameState.firstEnemySpawned = false;
         this.gameState.enemiesDefeated = 0;
+        this.gameState.enemiesEscaped = 0;
         
         // Check for wave skip bonus (perfect wave)
         if (this.gameState.waveSkipActive && this.gameState.currentWaveTypos === 0 && this.gameState.wave > 1) {
@@ -933,6 +956,7 @@ class TypeSlopGame {
         
         const enemyCount = Math.floor(10 + (this.gameState.wave * 1.5));
         this.gameState.totalEnemiesInWave = enemyCount;
+        console.log(`[WAVE] Wave ${this.gameState.wave} will spawn ${enemyCount} enemies`);
         this.spawnWaveEnemies(enemyCount);
         this.updateEnemyDefeatedDisplay();
     }
@@ -985,6 +1009,7 @@ class TypeSlopGame {
                 const x = margin + Math.random() * maxX;
                 
                 const enemy = new Enemy(word, type, x, 0);
+                console.log(`[SPAWN] Enemy spawned: ${enemy.word} (${enemy.type}) at position (${x}, 0), ID: ${enemy.id}`);
                 this.gameState.enemies.push(enemy);
                 this.createEnemyElement(enemy);
                 
@@ -1001,9 +1026,9 @@ class TypeSlopGame {
         const wave = this.gameState.wave;
         
         if (totalBatches === 1) {
-            // Single batch: standard mix
+            // Single batch: standard mix (double enemies disabled)
             return ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
-                    'fast', 'fast', 'double'];
+                    'fast', 'fast', 'fast'];
         }
         
         if (batchIndex === 0) {
@@ -1011,13 +1036,13 @@ class TypeSlopGame {
             return ['normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal',
                     'fast', 'fast'];
         } else if (batchIndex === totalBatches - 1) {
-            // Last batch: more challenging mix
+            // Last batch: more challenging mix (double enemies disabled)
             return ['normal', 'normal', 'normal', 'normal', 'normal',
-                    'fast', 'fast', 'fast', 'double', 'double'];
+                    'fast', 'fast', 'fast', 'fast', 'fast'];
         } else {
-            // Middle batches: balanced mix
+            // Middle batches: balanced mix (double enemies disabled)
             return ['normal', 'normal', 'normal', 'normal', 'normal', 'normal',
-                    'fast', 'fast', 'double'];
+                    'fast', 'fast', 'fast'];
         }
     }
 
@@ -1148,13 +1173,23 @@ class TypeSlopGame {
                     enemy.word.toLowerCase() === typedText
                 );
                 
+                let anyDestroyed = false;
                 enemiesToDestroy.forEach(enemy => {
-                    this.destroyEnemy(enemy);
+                    const destroyed = this.destroyEnemy(enemy);
+                    if (destroyed) {
+                        anyDestroyed = true;
+                    }
                 });
                 
-                this.typingInput.value = '';
-                e.target.value = '';
-                this.gameState.currentWordTypoCount = 0; // Reset typo count on successful word
+                // Only clear input if at least one enemy was actually destroyed
+                if (anyDestroyed) {
+                    this.typingInput.value = '';
+                    e.target.value = '';
+                    this.gameState.currentWordTypoCount = 0; // Reset typo count on successful word
+                    console.log('[TYPING] Input cleared - enemy(es) destroyed');
+                } else {
+                    console.log('[TYPING] Input preserved - enemy(es) damaged but not destroyed');
+                }
             }
         } else {
             // Reset consecutive letters if no matches found
@@ -1421,7 +1456,8 @@ class TypeSlopGame {
             // Increment enemies defeated counter
             this.gameState.enemiesDefeated++;
             this.updateEnemyDefeatedDisplay();
-            console.log('[DESTROY] Enemy destroyed. Enemies defeated:', this.gameState.enemiesDefeated);
+            console.log(`[DESTROY] Enemy ${enemy.word} (${enemy.type}) defeated! ID: ${enemy.id}`);
+            console.log(`[DESTROY] Wave progress - Defeated: ${this.gameState.enemiesDefeated}, Escaped: ${this.gameState.enemiesEscaped}, Total: ${this.gameState.enemiesDefeated + this.gameState.enemiesEscaped}/${this.gameState.totalEnemiesInWave}`);
             
             // Add cute tooth for completed word
             this.addCuteTooth();
@@ -1474,13 +1510,30 @@ class TypeSlopGame {
         }
         
         this.updateUI();
+        return destroyed; // Return whether enemy was destroyed
     }
 
     dropPowerUp(x, y) {
-        console.log('[POWERUP] Dropping power-up at position:', x, y);
+        console.log(`[POWERUP] ===== POWER-UP DROP =====`);
+        console.log(`[POWERUP] Dropping power-up at position (${x}, ${y})`);
+        
+        // Calculate drop chance
+        const baseChance = 0.2; // 20% base chance
+        const bonusChance = this.gameState.powerUpDropBonus;
+        const totalChance = baseChance + bonusChance;
+        const shouldDrop = Math.random() < totalChance;
+        
+        console.log(`[POWERUP] Drop chance - Base: ${(baseChance * 100).toFixed(1)}%, Bonus: ${(bonusChance * 100).toFixed(1)}%, Total: ${(totalChance * 100).toFixed(1)}%`);
+        console.log(`[POWERUP] Roll result: ${shouldDrop ? 'SUCCESS' : 'FAILED'}`);
+        
+        if (!shouldDrop) {
+            console.log('[POWERUP] No power-up dropped');
+            return;
+        }
+        
         const types = ['freeze', 'nuke', 'heal'];
         const type = types[Math.floor(Math.random() * types.length)];
-        console.log('[POWERUP] Type selected:', type);
+        console.log(`[POWERUP] Type selected: ${type}`);
         const powerUp = new PowerUp(type, x, y + 20);
         this.gameState.powerUps.push(powerUp);
         this.createPowerUpElement(powerUp);
@@ -1763,14 +1816,24 @@ class TypeSlopGame {
         
         // Update enemy positions
         this.gameState.enemies.forEach(enemy => {
-            const speedMultiplier = this.gameState.slowMoActive ? 0.3 : 1;
-            const speed = enemy.speed * this.gameState.enemySpeedMultiplier * speedMultiplier;
+            // Skip movement entirely if freeze is active
+            if (this.gameState.freezeActive) {
+                return;
+            }
             
             // Check if spawn delay has passed
             const timeSinceSpawn = Date.now() - enemy.spawnTime;
             if (timeSinceSpawn >= enemy.spawnDelay) {
+                const speedMultiplier = this.gameState.slowMoActive ? 0.3 : 1;
+                const speed = enemy.speed * this.gameState.enemySpeedMultiplier * speedMultiplier;
+                const oldY = enemy.y;
                 enemy.y += speed;
                 enemy.element.style.top = `${enemy.y}px`;
+                
+                // Log movement for debugging (only log significant movements)
+                if (Math.abs(speed) > 0.01) {
+                    console.log(`[MOVEMENT] ${enemy.word} (${enemy.type}) moved from Y:${oldY.toFixed(2)} to Y:${enemy.y.toFixed(2)} (speed: ${speed.toFixed(3)}, slowMo: ${this.gameState.slowMoActive})`);
+                }
             }
             
             // Check if enemy reached bottom
@@ -1782,8 +1845,13 @@ class TypeSlopGame {
         // Update power-up positions - remove falling behavior
         // Powerups now stay in place and disappear after timeout
         
-        // Check wave completion - only if enemies have been spawned and all are destroyed
-        if (this.gameState.enemies.length === 0 && this.gameState.gameRunning && this.gameState.waveEnemiesSpawned && this.gameState.firstEnemySpawned) {
+        // Check wave completion - only if enough enemies have been defeated
+        const totalEnemiesAccounted = this.gameState.enemiesDefeated + this.gameState.enemiesEscaped;
+        console.log(`[WAVE] Completion check - Defeated: ${this.gameState.enemiesDefeated}, Escaped: ${this.gameState.enemiesEscaped}, Total: ${totalEnemiesAccounted}/${this.gameState.totalEnemiesInWave}, Enemies on screen: ${this.gameState.enemies.length}`);
+        console.log(`[WAVE] Flags - gameRunning: ${this.gameState.gameRunning}, waveEnemiesSpawned: ${this.gameState.waveEnemiesSpawned}, firstEnemySpawned: ${this.gameState.firstEnemySpawned}`);
+        
+        if (totalEnemiesAccounted >= this.gameState.totalEnemiesInWave && this.gameState.gameRunning && this.gameState.waveEnemiesSpawned && this.gameState.firstEnemySpawned) {
+            console.log(`[WAVE] Wave ${this.gameState.wave} completed! Triggering completeWave()`);
             this.completeWave();
         }
         
@@ -1791,10 +1859,14 @@ class TypeSlopGame {
     }
 
     enemyReachedBottom(enemy) {
+        console.log(`[ESCAPE] Enemy ${enemy.word} (${enemy.type}) reached bottom! ID: ${enemy.id}, Position: (${enemy.x}, ${enemy.y})`);
+        console.log(`[ESCAPE] Lives remaining: ${this.gameState.lives - 1}, Total escaped this wave: ${this.gameState.enemiesEscaped + 1}`);
+        
         this.gameState.enemies = this.gameState.enemies.filter(e => e.id !== enemy.id);
         enemy.element.remove();
         this.gameState.lives--;
         this.gameState.combo = 0;
+        this.gameState.enemiesEscaped++; // Track escaped enemies
         
         // Show lose life image
         this.showLoseLifeImage(enemy.x, enemy.y);
@@ -1807,7 +1879,10 @@ class TypeSlopGame {
     }
 
     collectPowerUp(powerUp) {
-        console.log('[POWERUP] Collecting power-up:', powerUp.type, 'at position:', powerUp.x, powerUp.y);
+        console.log(`[POWERUP] ===== POWER-UP COLLECTED =====`);
+        console.log(`[POWERUP] Collected ${powerUp.type} power-up at position (${powerUp.x}, ${powerUp.y})`);
+        
+        // Remove power-up from game
         this.gameState.powerUps = this.gameState.powerUps.filter(p => p.id !== powerUp.id);
         powerUp.element.remove();
         
@@ -1831,7 +1906,9 @@ class TypeSlopGame {
     }
 
     freezeEnemies() {
-        console.log('[FREEZE] Freezing', this.gameState.enemies.length, 'enemies for 3 seconds');
+        console.log(`[FREEZE] ===== FREEZE ACTIVATED =====`);
+        console.log(`[FREEZE] Freezing ${this.gameState.enemies.length} enemies for 3 seconds`);
+        console.log(`[FREEZE] Freeze start time: ${new Date().toISOString()}`);
         
         // Set freeze state
         this.gameState.freezeActive = true;
@@ -1850,6 +1927,7 @@ class TypeSlopGame {
             console.log('[FREEZE] Setting enemy speed to 0:', enemy.word);
             enemy.speed = 0;
             enemy.element.style.filter = 'hue-rotate(200deg) brightness(1.5)';
+            enemy.element.style.transition = 'none'; // Disable CSS transitions for instant freeze
         });
         
         // Set timeout to end freeze
@@ -1859,7 +1937,9 @@ class TypeSlopGame {
     }
 
     endFreeze(enemySpeeds) {
-        console.log('[FREEZE] Ending freeze for all enemies');
+        console.log(`[FREEZE] ===== FREEZE ENDED =====`);
+        console.log(`[FREEZE] Freeze end time: ${new Date().toISOString()}`);
+        console.log(`[FREEZE] Restoring speeds for ${this.gameState.enemies.length} enemies`);
         this.gameState.freezeActive = false;
         this.gameState.freezeEndTime = 0;
         
@@ -1868,6 +1948,7 @@ class TypeSlopGame {
             console.log('[FREEZE] Restoring enemy speed:', enemy.word);
             enemy.speed = enemySpeeds.get(enemy.id) || enemy.getBaseSpeed();
             enemy.element.style.filter = '';
+            enemy.element.style.transition = ''; // Restore CSS transitions
         });
     }
 
@@ -1910,8 +1991,10 @@ class TypeSlopGame {
         
         setTimeout(() => {
             const oldLives = this.gameState.lives;
-            this.gameState.lives = Math.min(this.gameState.lives + 1, this.gameState.maxLives);
-            console.log('[HEAL] Lives changed from', oldLives, 'to', this.gameState.lives);
+            // Allow overhealing up to maxLives + 2 (temporary bonus lives)
+            const effectiveMaxLives = this.gameState.maxLives + 2;
+            this.gameState.lives = Math.min(this.gameState.lives + 1, effectiveMaxLives);
+            console.log('[HEAL] Lives changed from', oldLives, 'to', this.gameState.lives, '(Effective max:', effectiveMaxLives + ')');
             this.updateUI();
             
             // Also update the lives display directly to ensure it updates
