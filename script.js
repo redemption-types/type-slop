@@ -117,6 +117,9 @@ class GameState {
         this.rerollLuckBonus = 0; // Bonus chance for higher rarity upgrades
         this.waveSkipActive = false; // Whether wave skip bonus is active
         this.currentWaveTypos = 0; // Track typos in current wave for wave skip
+        
+        // Powerup Drop Chance system
+        this.powerUpDropBonus = 0; // Bonus to powerup drop chance (percentage)
     }
 }
 
@@ -257,6 +260,14 @@ const UPGRADES = [
             gameState.chainLightningSlow = 0;
         }
     },
+    {
+        name: 'Powerup Drop I',
+        description: '+5% chance for powerup drops on enemy defeat',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.powerUpDropBonus += 0.05;
+        }
+    },
     
     // Rare upgrades (25% chance)
     {
@@ -309,6 +320,14 @@ const UPGRADES = [
             gameState.chainLightningTargets = 1;
             gameState.chainLightningDamage = 1;
             gameState.chainLightningSlow = 1;
+        }
+    },
+    {
+        name: 'Powerup Drop II',
+        description: '+10% chance for powerup drops on enemy defeat',
+        rarity: 'rare',
+        apply: (gameState) => {
+            gameState.powerUpDropBonus += 0.10;
         }
     },
     
@@ -366,6 +385,14 @@ const UPGRADES = [
             gameState.chainLightningSlow = 0;
         }
     },
+    {
+        name: 'Powerup Drop III',
+        description: '+15% chance for powerup drops on enemy defeat',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.powerUpDropBonus += 0.15;
+        }
+    },
     
     // Legendary upgrades (3% chance)
     {
@@ -420,6 +447,14 @@ const UPGRADES = [
             gameState.chainLightningTargets = 3;
             gameState.chainLightningDamage = 1;
             gameState.chainLightningSlow = 0;
+        }
+    },
+    {
+        name: 'Powerup Drop IV',
+        description: '+25% chance for powerup drops on enemy defeat',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.powerUpDropBonus += 0.25;
         }
     },
     {
@@ -1397,7 +1432,8 @@ class TypeSlopGame {
             }
             
             // Chance to drop power-up
-            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.2;
+            const baseDropChance = 0.2;
+            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : baseDropChance + this.gameState.powerUpDropBonus;
             if (Math.random() < dropChance) {
                 console.log('[POWERUP] Dropping power-up from enemy:', enemy.word);
                 this.dropPowerUp(enemy.x, enemy.y);
