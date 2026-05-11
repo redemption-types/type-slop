@@ -668,9 +668,9 @@ body::before {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: min(550px, 90vw);
-    height: min(780px, 87vh);
-    max-height: 87vh;
+    width: min(650px, 95vw);
+    height: min(820px, 90vh);
+    max-height: 90vh;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(20px) saturate(180%);
     display: flex;
@@ -1796,12 +1796,23 @@ body::before {
     transform: translateY(0);
 }
 
+/* Upgrade title text image styling */
+.upgrade-title-text img {
+    max-width: 100%;
+    height: auto;
+    width: auto;
+    max-height: 80px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
 /* Add responsive media query for very small screens */
 @media (max-width: 768px) {
     #upgrade-screen {
-        width: 95vw;
-        height: 92vh;
-        max-height: 92vh;
+        width: 98vw;
+        height: 95vh;
+        max-height: 95vh;
         padding: 12px;
     }
     
@@ -1810,8 +1821,56 @@ body::before {
         margin-bottom: clamp(6px, 1.2vh, 10px);
     }
     
-    .upgrade-title-image {
-        max-width: clamp(140px, 25vw, 220px);
+    .upgrade-title-text {
+        font-size: clamp(12px, 2.5vw, 16px);
+        font-weight: 900;
+        background: linear-gradient(135deg, #00D4FF 0%, #7B2FFF 50%, #FF00FF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.6)) drop-shadow(0 0 4px rgba(123, 47, 255, 0.4));
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-align: center;
+        animation: title-glow 2s ease-in-out infinite, title-pulse 3s ease-in-out infinite;
+        margin: 0 auto;
+        padding: 8px 16px;
+        line-height: 1.0;
+        position: relative;
+        display: inline-block;
+    }
+
+    .upgrade-title-text img {
+        max-width: 100%;
+        height: auto;
+        width: auto;
+        max-height: 60px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .upgrade-title-text::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(123, 47, 255, 0.3), rgba(255, 0, 255, 0.3));
+        border-radius: 8px;
+        z-index: -1;
+        animation: border-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes title-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    @keyframes border-glow {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
     }
     
     .upgrade-wave-counter {
@@ -1872,8 +1931,8 @@ body::before {
 /* Extra small screens (laptops, tablets) */
 @media (max-height: 600px) {
     #upgrade-screen {
-        height: 97vh;
-        max-height: 97vh;
+        height: 99vh;
+        max-height: 99vh;
         padding: 10px;
     }
     

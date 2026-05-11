@@ -1980,11 +1980,14 @@ class TypeSlopGame {
             return;
         }
         
+        const bottomThreshold = this.gameArea.offsetHeight - 60;
         const nearestEnemy = this.gameState.enemies.reduce((nearest, enemy) => {
-            return enemy.y > nearest.y ? enemy : nearest;
+            const nearestDistance = bottomThreshold - nearest.y;
+            const enemyDistance = bottomThreshold - enemy.y;
+            return enemyDistance < nearestDistance ? enemy : nearest;
         });
         
-        console.log('[NUKE] Targeting enemy:', nearestEnemy.word, 'at Y:', nearestEnemy.y);
+        console.log('[NUKE] Targeting enemy closest to bottom:', nearestEnemy.word, 'at Y:', nearestEnemy.y, 'distance to bottom:', bottomThreshold - nearestEnemy.y);
         // Show nuke effect at enemy position
         // this.showPowerUpEffect('nuke', '💥', nearestEnemy.x, nearestEnemy.y);
         
