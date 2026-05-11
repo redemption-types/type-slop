@@ -61,12 +61,42 @@ class GameState {
         this.wordsCompleted = 0; // Total words completed
         this.toothStack = []; // Array of tooth positions (left to right, max 10)
         this.toothKings = 0; // Number of king teeth (each represents 10 completed words)
+        
+        // Focus Fire system
+        this.consecutiveCorrectLetters = 0; // Track consecutive correct letters
+        this.focusFireBonus = 0; // Damage bonus from Focus Fire upgrades (percentage)
+        this.maxFocusFireBonus = 0; // Maximum bonus percentage from upgrades
+        
+        // Chain Lightning system
+        this.chainLightningChance = 0; // Chance to trigger chain lightning (percentage)
+        this.chainLightningTargets = 1; // Number of enemies to hit
+        this.chainLightningDamage = 1; // Damage dealt to chained enemies
+        this.chainLightningSlow = 0; // Slow duration in seconds
+        
+        // Bomb Words system
+        this.bombWordChance = 0; // Chance for enemy to spawn with bomb word
+        this.bombRadius = 100; // Explosion radius in pixels
+        this.bombFreezeDuration = 0; // Freeze duration in seconds
+        this.bombWords = ['BOOM', 'BLAST', 'BANG', 'POW', 'KABOOM']; // Special bomb words
+        
+        // Armor Shred system
+        this.armorShredActive = false; // Whether armor shred is active
+        this.doubleWordReduction = 0.3; // Percentage reduction for double enemy second words
+        
+        // Auto-Correct system
+        this.autoCorrectActive = false; // Whether auto-correct is active
+        this.currentWordTypoCount = 0; // Track typos in current word
+        
+        // Economic/Strategic system
+        this.rerollLuckBonus = 0; // Bonus chance for higher rarity upgrades
+        this.waveSkipActive = false; // Whether wave skip bonus is active
+        this.currentWaveTypos = 0; // Track typos in current wave for wave skip
     }
 }
 
 // Enemy Class
 class Enemy {
-    constructor(word, type, x, y) {
+    constructor(word, type, x, y, isBombWord = false) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.word = word;
         this.type = type;
@@ -77,6 +107,7 @@ class Enemy {
         this.speed = this.getBaseSpeed();
         this.element = null;
         this.originalWord = word;
+        this.isBombWord = isBombWord; // Flag for bomb word enemies
     }
 
     getBaseSpeed() {
@@ -99,8 +130,17 @@ class Enemy {
         
         // For double enemies, swap to a new shorter word after first hit
         if (this.type === 'double' && this.hp === 1) {
-            const shortWords = WORD_LISTS.short;
-            const newWord = shortWords[Math.floor(Math.random() * shortWords.length)];
+            const game = window.game;
+            let wordList = WORD_LISTS.short;
+            
+            // Apply Armor Shred if active
+            if (game && game.gameState.armorShredActive) {
+                // Create ultra-short words for armor shred
+                const ultraShortWords = ['CAT', 'DOG', 'RUN', 'JUMP', 'HIT', 'FIRE', 'ICE', 'WIND', 'EAT', 'SIT'];
+                wordList = ultraShortWords;
+            }
+            
+            const newWord = wordList[Math.floor(Math.random() * wordList.length)];
             this.word = newWord;
             this.originalWord = newWord;
             return false; // Enemy still alive but word changed
@@ -171,6 +211,26 @@ const UPGRADES = [
             gameState.spawnDelayMultiplier *= 1.03;
         }
     },
+    {
+        name: 'Focus Fire I',
+        description: 'Consecutive correct letters grant +1% damage per letter (max +5%)',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.focusFireBonus = 1;
+            gameState.maxFocusFireBonus = 5;
+        }
+    },
+    {
+        name: 'Chain Lightning I',
+        description: '10% chance to deal 1 damage to nearest enemy on word completion',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.chainLightningChance = 10;
+            gameState.chainLightningTargets = 1;
+            gameState.chainLightningDamage = 1;
+            gameState.chainLightningSlow = 0;
+        }
+    },
     
     // Rare upgrades (25% chance)
     {
@@ -203,6 +263,36 @@ const UPGRADES = [
         rarity: 'rare',
         apply: (gameState) => {
             gameState.comboDamageBonus += 0.05;
+        }
+    },
+    {
+        name: 'Focus Fire II',
+        description: 'Consecutive correct letters grant +2% damage per letter (max +10%)',
+        rarity: 'rare',
+        apply: (gameState) => {
+            gameState.focusFireBonus = 2;
+            gameState.maxFocusFireBonus = 10;
+        }
+    },
+    {
+        name: 'Chain Lightning II',
+        description: '15% chance to damage nearest enemy + 25% slow for 1s',
+        rarity: 'rare',
+        apply: (gameState) => {
+            gameState.chainLightningChance = 15;
+            gameState.chainLightningTargets = 1;
+            gameState.chainLightningDamage = 1;
+            gameState.chainLightningSlow = 1;
+        }
+    },
+    {
+        name: 'Bomb Words I',
+        description: 'Bomb words clear 100px radius',
+        rarity: 'rare',
+        apply: (gameState) => {
+            gameState.bombWordChance = 8;
+            gameState.bombRadius = 100;
+            gameState.bombFreezeDuration = 0;
         }
     },
     
@@ -240,6 +330,36 @@ const UPGRADES = [
             gameState.slowMoReady = true;
         }
     },
+    {
+        name: 'Focus Fire III',
+        description: 'Consecutive correct letters grant +3% damage per letter (max +15%)',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.focusFireBonus = 3;
+            gameState.maxFocusFireBonus = 15;
+        }
+    },
+    {
+        name: 'Chain Lightning III',
+        description: '20% chance to damage 2 nearest enemies',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.chainLightningChance = 20;
+            gameState.chainLightningTargets = 2;
+            gameState.chainLightningDamage = 1;
+            gameState.chainLightningSlow = 0;
+        }
+    },
+    {
+        name: 'Bomb Words II',
+        description: 'Bomb words clear 150px radius + 1s freeze',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.bombWordChance = 10;
+            gameState.bombRadius = 150;
+            gameState.bombFreezeDuration = 1;
+        }
+    },
     
     // Legendary upgrades (3% chance)
     {
@@ -275,6 +395,92 @@ const UPGRADES = [
         apply: (gameState) => {
             gameState.comboDamageBonus *= 2;
         }
+    },
+    {
+        name: 'Focus Fire IV',
+        description: 'Consecutive correct letters grant +5% damage per letter (max +25%)',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.focusFireBonus = 5;
+            gameState.maxFocusFireBonus = 25;
+        }
+    },
+    {
+        name: 'Chain Lightning IV',
+        description: '30% chance to damage 3 nearest enemies + chain effect',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.chainLightningChance = 30;
+            gameState.chainLightningTargets = 3;
+            gameState.chainLightningDamage = 1;
+            gameState.chainLightningSlow = 0;
+        }
+    },
+    {
+        name: 'Bomb Words III',
+        description: 'Bomb words clear 200px radius + 2s freeze',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.bombWordChance = 12;
+            gameState.bombRadius = 200;
+            gameState.bombFreezeDuration = 2;
+        }
+    },
+    {
+        name: 'Armor Shred',
+        description: 'Double enemies change to ultra-short 3-letter words after first hit',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.armorShredActive = true;
+        }
+    },
+    {
+        name: 'Auto-Correct',
+        description: 'The first typo in each word is automatically corrected',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.autoCorrectActive = true;
+        }
+    },
+    {
+        name: 'Reroll Luck I',
+        description: '+5% chance for higher rarity upgrades',
+        rarity: 'common',
+        apply: (gameState) => {
+            gameState.rerollLuckBonus = 0.05;
+        }
+    },
+    {
+        name: 'Reroll Luck II',
+        description: '+10% chance for higher rarity upgrades',
+        rarity: 'rare',
+        apply: (gameState) => {
+            gameState.rerollLuckBonus = 0.10;
+        }
+    },
+    {
+        name: 'Reroll Luck III',
+        description: '+15% chance for higher rarity upgrades',
+        rarity: 'epic',
+        apply: (gameState) => {
+            gameState.rerollLuckBonus = 0.15;
+        }
+    },
+    {
+        name: 'Reroll Luck IV',
+        description: '+25% chance for higher rarity upgrades',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.rerollLuckBonus = 0.25;
+        }
+    },
+    {
+        name: 'Wave Skip Bonus',
+        description: 'Perfect waves (no typos) grant a bonus upgrade',
+        rarity: 'legendary',
+        apply: (gameState) => {
+            gameState.waveSkipActive = true;
+        }
     }
 ];
 
@@ -287,10 +493,29 @@ class Lootbox {
     }
 
     getRandomRarity() {
+        const game = window.game;
+        let adjustedProbabilities = { ...RARITY_PROBABILITIES };
+        
+        // Apply Reroll Luck bonus if active
+        if (game && game.gameState.rerollLuckBonus > 0) {
+            const bonus = game.gameState.rerollLuckBonus;
+            
+            // Shift probability from common to higher rarities
+            adjustedProbabilities.common = Math.max(0, adjustedProbabilities.common - bonus);
+            
+            // Distribute the bonus to higher rarities
+            const higherRarities = ['rare', 'epic', 'legendary'];
+            const bonusPerRarity = bonus / higherRarities.length;
+            
+            higherRarities.forEach(rarity => {
+                adjustedProbabilities[rarity] += bonusPerRarity;
+            });
+        }
+        
         const roll = Math.random();
         let cumulative = 0;
         
-        for (const [rarity, probability] of Object.entries(RARITY_PROBABILITIES)) {
+        for (const [rarity, probability] of Object.entries(adjustedProbabilities)) {
             cumulative += probability;
             if (roll <= cumulative) {
                 return rarity;
@@ -669,6 +894,15 @@ class TypeSlopGame {
         this.gameState.firstEnemySpawned = false;
         this.gameState.enemiesDefeated = 0;
         
+        // Check for wave skip bonus (perfect wave)
+        if (this.gameState.waveSkipActive && this.gameState.currentWaveTypos === 0 && this.gameState.wave > 1) {
+            console.log('[WAVE SKIP] Perfect wave achieved! Granting bonus upgrade.');
+            this.grantBonusUpgrade();
+        }
+        
+        // Reset wave typo counter
+        this.gameState.currentWaveTypos = 0;
+        
         const enemyCount = Math.floor(10 + (this.gameState.wave * 1.5));
         this.gameState.totalEnemiesInWave = enemyCount;
         this.spawnWaveEnemies(enemyCount);
@@ -714,10 +948,18 @@ class TypeSlopGame {
                 
                 const type = batchTypes[Math.floor(Math.random() * batchTypes.length)];
                 const wordList = this.getWordListForType(type);
-                const word = wordList[Math.floor(Math.random() * wordList.length)];
+                let word = wordList[Math.floor(Math.random() * wordList.length)];
+                let isBombWord = false;
+                
+                // Check if this enemy should be a bomb word
+                if (this.gameState.bombWordChance > 0 && Math.random() * 100 < this.gameState.bombWordChance) {
+                    word = this.gameState.bombWords[Math.floor(Math.random() * this.gameState.bombWords.length)];
+                    isBombWord = true;
+                }
+                
                 const x = Math.random() * (this.gameArea.offsetWidth - 100);
                 
-                const enemy = new Enemy(word, type, x, -50);
+                const enemy = new Enemy(word, type, x, -50, isBombWord);
                 this.gameState.enemies.push(enemy);
                 this.createEnemyElement(enemy);
                 
@@ -808,7 +1050,7 @@ class TypeSlopGame {
 
     createEnemyElement(enemy) {
         const element = document.createElement('div');
-        element.className = `enemy ${enemy.type}`;
+        element.className = `enemy ${enemy.type}${enemy.isBombWord ? ' bomb-word' : ''}`;
         
         // Create HP display for multi-HP enemies
         if ((enemy.type === 'tank' || enemy.type === 'double') && enemy.hp > 1) {
@@ -850,6 +1092,8 @@ class TypeSlopGame {
         
         if (!typedText) {
             this.clearEnemyHighlights();
+            this.gameState.consecutiveCorrectLetters = 0;
+            this.gameState.currentWordTypoCount = 0;
             return;
         }
 
@@ -863,6 +1107,11 @@ class TypeSlopGame {
         this.clearEnemyHighlights();
         
         if (matchedEnemies.length > 0) {
+            // Track consecutive correct letters for Focus Fire
+            if (typedText.length > 0) {
+                this.gameState.consecutiveCorrectLetters = typedText.length;
+            }
+            
             // Highlight all matched enemies
             matchedEnemies.forEach(enemy => {
                 enemy.element.classList.add('matched');
@@ -880,8 +1129,90 @@ class TypeSlopGame {
                 
                 this.typingInput.value = '';
                 e.target.value = '';
+                this.gameState.currentWordTypoCount = 0; // Reset typo count on successful word
+            }
+        } else {
+            // Reset consecutive letters if no matches found
+            this.gameState.consecutiveCorrectLetters = 0;
+            
+            // Track typos for wave skip system
+            if (typedText.length > 0) {
+                this.gameState.currentWaveTypos++;
+            }
+            
+            // Check if this is a typo and handle auto-correct
+            if (this.gameState.autoCorrectActive && this.gameState.currentWordTypoCount === 0) {
+                // Try to find the closest matching enemy word
+                const closestMatch = this.findClosestWordMatch(typedText);
+                if (closestMatch) {
+                    console.log('[AUTO-CORRECT] Corrected typo:', typedText, '->', closestMatch.word);
+                    this.typingInput.value = closestMatch.word.substring(0, typedText.length);
+                    e.target.value = closestMatch.word.substring(0, typedText.length);
+                    this.gameState.currentWordTypoCount = 1; // Mark that we used auto-correct for this word
+                    
+                    // Re-trigger typing handling with corrected input
+                    setTimeout(() => this.handleTyping(e), 10);
+                    return;
+                }
+            }
+            
+            this.gameState.currentWordTypoCount++;
+        }
+    }
+
+    findClosestWordMatch(typedText) {
+        let closestMatch = null;
+        let minDistance = Infinity;
+        
+        for (const enemy of this.gameState.enemies) {
+            const word = enemy.word.toLowerCase();
+            // Check if typed text is a subset of the word (common typo scenario)
+            if (word.includes(typedText) && typedText.length >= 2) {
+                const distance = word.length - typedText.length;
+                if (distance < minDistance && distance <= 2) { // Allow up to 2 character difference
+                    minDistance = distance;
+                    closestMatch = enemy;
+                }
+            }
+            // Check for transposition or single character errors
+            else if (this.calculateLevenshteinDistance(typedText, word) <= 1 && typedText.length >= 2) {
+                const distance = Math.abs(typedText.length - word.length);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestMatch = enemy;
+                }
             }
         }
+        
+        return closestMatch;
+    }
+
+    calculateLevenshteinDistance(str1, str2) {
+        const matrix = [];
+        
+        for (let i = 0; i <= str2.length; i++) {
+            matrix[i] = [i];
+        }
+        
+        for (let j = 0; j <= str1.length; j++) {
+            matrix[0][j] = j;
+        }
+        
+        for (let i = 1; i <= str2.length; i++) {
+            for (let j = 1; j <= str1.length; j++) {
+                if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
+            }
+        }
+        
+        return matrix[str2.length][str1.length];
     }
 
     clearEnemyHighlights() {
@@ -890,8 +1221,220 @@ class TypeSlopGame {
         });
     }
 
+    calculateFocusFireDamage() {
+        if (this.gameState.focusFireBonus === 0) return 0;
+        
+        // Calculate damage bonus based on consecutive correct letters
+        const bonusPercentage = Math.min(this.gameState.consecutiveCorrectLetters * this.gameState.focusFireBonus, this.gameState.maxFocusFireBonus);
+        return Math.floor(bonusPercentage / 100 * this.gameState.typingDamage);
+    }
+
+    triggerChainLightning(sourceX, sourceY) {
+        console.log('[CHAIN LIGHTNING] Triggered at position:', sourceX, sourceY);
+        
+        // Find nearest enemies
+        const nearbyEnemies = this.findNearestEnemies(sourceX, sourceY, this.gameState.chainLightningTargets);
+        
+        nearbyEnemies.forEach((enemy, index) => {
+            setTimeout(() => {
+                if (enemy.element && enemy.element.parentNode) {
+                    // Apply damage
+                    const destroyed = enemy.takeDamage(this.gameState.chainLightningDamage);
+                    
+                    // Apply slow effect if applicable
+                    if (this.gameState.chainLightningSlow > 0) {
+                        this.applySlowToEnemy(enemy, this.gameState.chainLightningSlow);
+                    }
+                    
+                    // Create lightning visual effect
+                    this.createLightningEffect(sourceX, sourceY, enemy.x, enemy.y);
+                    
+                    if (destroyed) {
+                        this.gameState.enemies = this.gameState.enemies.filter(e => e.id !== enemy.id);
+                        enemy.element.remove();
+                        this.gameState.score += 5; // Reduced score for chained kills
+                        this.gameState.enemiesDefeated++;
+                        this.updateEnemyDefeatedDisplay();
+                    } else {
+                        enemy.element.classList.add('lightning-damaged');
+                        setTimeout(() => enemy.element.classList.remove('lightning-damaged'), 300);
+                    }
+                }
+            }, index * 100); // Stagger the effects
+        });
+    }
+
+    findNearestEnemies(sourceX, sourceY, count) {
+        return this.gameState.enemies
+            .map(enemy => ({
+                enemy,
+                distance: Math.sqrt(Math.pow(enemy.x - sourceX, 2) + Math.pow(enemy.y - sourceY, 2))
+            }))
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, count)
+            .map(item => item.enemy);
+    }
+
+    applySlowToEnemy(enemy, duration) {
+        const originalSpeed = enemy.speed;
+        enemy.speed *= 0.5; // Slow by 50%
+        enemy.element.style.filter = 'hue-rotate(180deg) brightness(1.2)';
+        
+        setTimeout(() => {
+            if (enemy.element && enemy.element.parentNode) {
+                enemy.speed = originalSpeed;
+                enemy.element.style.filter = '';
+            }
+        }, duration * 1000);
+    }
+
+    createLightningEffect(x1, y1, x2, y2) {
+        const lightning = document.createElement('div');
+        lightning.className = 'lightning-effect';
+        lightning.style.position = 'absolute';
+        lightning.style.left = `${x1}px`;
+        lightning.style.top = `${y1}px`;
+        lightning.style.width = `${Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))}px`;
+        lightning.style.height = '2px';
+        lightning.style.background = 'linear-gradient(90deg, #00ffff, #ffffff, #00ffff)';
+        lightning.style.transformOrigin = 'left center';
+        lightning.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1)}rad)`;
+        lightning.style.zIndex = '1000';
+        lightning.style.boxShadow = '0 0 10px #00ffff';
+        lightning.style.opacity = '1';
+        
+        this.enemiesContainer.appendChild(lightning);
+        
+        // Fade out and remove
+        setTimeout(() => {
+            lightning.style.opacity = '0';
+            lightning.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => lightning.remove(), 300);
+        }, 100);
+    }
+
+    triggerBombExplosion(sourceX, sourceY) {
+        console.log('[BOMB] Explosion triggered at position:', sourceX, sourceY);
+        
+        // Find enemies within explosion radius
+        const enemiesInRadius = this.findEnemiesInRadius(sourceX, sourceY, this.gameState.bombRadius);
+        
+        // Create visual explosion effect
+        this.createBombExplosionEffect(sourceX, sourceY);
+        
+        // Damage all enemies in radius
+        enemiesInRadius.forEach(enemy => {
+            const destroyed = enemy.takeDamage(1); // Bomb deals 1 damage to all in radius
+            
+            // Apply freeze effect if applicable
+            if (this.gameState.bombFreezeDuration > 0) {
+                this.applySlowToEnemy(enemy, this.gameState.bombFreezeDuration);
+            }
+            
+            if (destroyed) {
+                this.gameState.enemies = this.gameState.enemies.filter(e => e.id !== enemy.id);
+                enemy.element.remove();
+                this.gameState.score += 3; // Reduced score for bomb kills
+                this.gameState.enemiesDefeated++;
+                this.updateEnemyDefeatedDisplay();
+            } else {
+                enemy.element.classList.add('bomb-damaged');
+                setTimeout(() => enemy.element.classList.remove('bomb-damaged'), 500);
+            }
+        });
+    }
+
+    findEnemiesInRadius(sourceX, sourceY, radius) {
+        return this.gameState.enemies.filter(enemy => {
+            const distance = Math.sqrt(Math.pow(enemy.x - sourceX, 2) + Math.pow(enemy.y - sourceY, 2));
+            return distance <= radius;
+        });
+    }
+
+    createBombExplosionEffect(x, y) {
+        const explosion = document.createElement('div');
+        explosion.className = 'bomb-explosion';
+        explosion.style.position = 'absolute';
+        explosion.style.left = `${x}px`;
+        explosion.style.top = `${y}px`;
+        explosion.style.width = `${this.gameState.bombRadius * 2}px`;
+        explosion.style.height = `${this.gameState.bombRadius * 2}px`;
+        explosion.style.borderRadius = '50%';
+        explosion.style.background = 'radial-gradient(circle, rgba(255,200,0,0.8) 0%, rgba(255,100,0,0.6) 50%, rgba(255,0,0,0.4) 100%)';
+        explosion.style.transform = 'translate(-50%, -50%)';
+        explosion.style.zIndex = '999';
+        explosion.style.boxShadow = '0 0 30px rgba(255,100,0,0.8)';
+        explosion.style.opacity = '1';
+        
+        this.enemiesContainer.appendChild(explosion);
+        
+        // Animate explosion
+        setTimeout(() => {
+            explosion.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            explosion.style.opacity = '0';
+            explosion.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+            setTimeout(() => explosion.remove(), 500);
+        }, 50);
+    }
+
+    grantBonusUpgrade() {
+        // Get a random upgrade with higher rarity bias
+        const bonusRarityRoll = Math.random();
+        let rarity;
+        
+        if (bonusRarityRoll < 0.1) {
+            rarity = 'legendary';
+        } else if (bonusRarityRoll < 0.3) {
+            rarity = 'epic';
+        } else if (bonusRarityRoll < 0.6) {
+            rarity = 'rare';
+        } else {
+            rarity = 'common';
+        }
+        
+        const upgrade = this.lootbox.getRandomUpgrade(rarity);
+        if (upgrade) {
+            upgrade.apply(this.gameState);
+            this.gameState.upgrades.push(upgrade);
+            this.updateUpgradesDisplay();
+            
+            // Show bonus upgrade notification
+            this.showBonusUpgradeNotification(upgrade);
+        }
+    }
+
+    showBonusUpgradeNotification(upgrade) {
+        const notification = document.createElement('div');
+        notification.className = 'bonus-upgrade-notification';
+        notification.innerHTML = `
+            <div class="bonus-upgrade-content">
+                <h3>PERFECT WAVE BONUS!</h3>
+                <div class="bonus-upgrade-card">
+                    <div class="card-rarity" style="color: ${RARITY_COLORS[upgrade.rarity]}">
+                        ${upgrade.rarity.toUpperCase()}
+                    </div>
+                    <div class="card-name">${upgrade.name}</div>
+                    <div class="card-description">${upgrade.description}</div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
+
     destroyEnemy(enemy) {
-        const damage = this.gameState.typingDamage + Math.floor(this.gameState.combo / 5) * this.gameState.comboDamageBonus;
+        // Calculate Focus Fire damage bonus
+        const focusFireDamage = this.calculateFocusFireDamage();
+        const damage = this.gameState.typingDamage + focusFireDamage + Math.floor(this.gameState.combo / 5) * this.gameState.comboDamageBonus;
         const destroyed = enemy.takeDamage(damage);
         
         if (destroyed) {
@@ -905,6 +1448,19 @@ class TypeSlopGame {
             // Update score and combo
             this.gameState.score += 10 * (this.gameState.combo + 1);
             this.gameState.combo++;
+            
+            // Reset consecutive letters on successful word completion
+            this.gameState.consecutiveCorrectLetters = 0;
+            
+            // Trigger Chain Lightning if applicable
+            if (this.gameState.chainLightningChance > 0 && Math.random() * 100 < this.gameState.chainLightningChance) {
+                this.triggerChainLightning(enemy.x, enemy.y);
+            }
+            
+            // Trigger bomb explosion if this was a bomb word
+            if (enemy.isBombWord) {
+                this.triggerBombExplosion(enemy.x, enemy.y);
+            }
             
             // Increment enemies defeated counter
             this.gameState.enemiesDefeated++;

@@ -93,6 +93,119 @@ body::before {
     align-items: center;
 }
 
+/* Chain Lightning Effects */
+.lightning-damaged {
+    animation: lightning-flash 0.3s ease-in-out;
+}
+
+@keyframes lightning-flash {
+    0%, 100% { 
+        filter: brightness(1) hue-rotate(0deg);
+        transform: scale(1);
+    }
+    50% { 
+        filter: brightness(2) hue-rotate(180deg);
+        transform: scale(1.1);
+    }
+}
+
+/* Bomb Word Effects */
+.bomb-damaged {
+    animation: bomb-shake 0.5s ease-in-out;
+}
+
+@keyframes bomb-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px) rotate(-2deg); }
+    50% { transform: translateX(5px) rotate(2deg); }
+    75% { transform: translateX(-3px) rotate(-1deg); }
+}
+
+.enemy.bomb-word {
+    background: linear-gradient(135deg, rgba(255,100,0,0.3), rgba(255,0,0,0.3));
+    border: 2px solid rgba(255,100,0,0.8);
+    box-shadow: 0 0 15px rgba(255,100,0,0.6);
+    animation: bomb-pulse 2s ease-in-out infinite;
+}
+
+@keyframes bomb-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(255,100,0,0.6);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(255,100,0,0.9);
+        transform: scale(1.05);
+    }
+}
+
+/* Bonus Upgrade Notification */
+.bonus-upgrade-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: linear-gradient(135deg, rgba(16,185,129,0.95), rgba(34,197,94,0.95));
+    border: 2px solid rgba(16,185,129,0.8);
+    border-radius: 20px;
+    padding: 30px;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 20px 60px rgba(16,185,129,0.4);
+    backdrop-filter: blur(20px);
+    text-align: center;
+    min-width: 350px;
+}
+
+.bonus-upgrade-notification.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.bonus-upgrade-content h3 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px #ffffff, 0 0 20px #10b981; }
+    to { text-shadow: 0 0 20px #ffffff, 0 0 30px #10b981; }
+}
+
+.bonus-upgrade-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.bonus-upgrade-card .card-rarity {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.bonus-upgrade-card .card-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.bonus-upgrade-card .card-description {
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.4;
+}
+
 /* Top Bar (now only for slow-mo) */
 #top-bar {
     background: var(--glass-bg);
