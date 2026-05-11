@@ -108,6 +108,8 @@ class Enemy {
         this.element = null;
         this.originalWord = word;
         this.isBombWord = isBombWord; // Flag for bomb word enemies
+        this.spawnDelay = 500; // 0.5 second delay before starting to fall
+        this.spawnTime = Date.now(); // Track when this enemy was spawned
     }
 
     getBaseSpeed() {
@@ -957,9 +959,13 @@ class TypeSlopGame {
                     isBombWord = true;
                 }
                 
-                const x = Math.random() * (this.gameArea.offsetWidth - 100);
+                // Ensure words spawn fully on screen with safe margins
+                const enemyWidth = 120; // Estimated maximum enemy width including padding
+                const margin = 20; // Safe margin from edges
+                const maxX = Math.max(0, this.gameArea.offsetWidth - enemyWidth - margin);
+                const x = margin + Math.random() * maxX;
                 
-                const enemy = new Enemy(word, type, x, -50, isBombWord);
+                const enemy = new Enemy(word, type, x, 0, isBombWord);
                 this.gameState.enemies.push(enemy);
                 this.createEnemyElement(enemy);
                 
@@ -1829,8 +1835,13 @@ class TypeSlopGame {
         this.gameState.enemies.forEach(enemy => {
             const speedMultiplier = this.gameState.slowMoActive ? 0.3 : 1;
             const speed = enemy.speed * this.gameState.enemySpeedMultiplier * speedMultiplier;
-            enemy.y += speed;
-            enemy.element.style.top = `${enemy.y}px`;
+            
+            // Check if spawn delay has passed
+            const timeSinceSpawn = Date.now() - enemy.spawnTime;
+            if (timeSinceSpawn >= enemy.spawnDelay) {
+                enemy.y += speed;
+                enemy.element.style.top = `${enemy.y}px`;
+            }
             
             // Check if enemy reached bottom
             if (enemy.y > this.gameArea.offsetHeight - 60) {
