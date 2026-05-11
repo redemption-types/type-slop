@@ -19,9 +19,8 @@ TypeSlop challenges players to type words displayed on enemies to destroy them b
 - **Normal Enemies** (Blue): Standard speed, medium-length words (4-7 letters)
 - **Fast Enemies** (Red): 50% faster movement, short words (3-5 letters)
 - **Double HP Enemies** (Purple): 20% slower movement, 2 health points, changes word when first hit
-- **Bomb Word Enemies** (Orange/Red): Special enemies with words like "BOOM", "BLAST" that create area explosions when destroyed
 
-### Power-ups (10% drop chance)
+### Power-ups (20% drop chance)
 - **Freeze** ❄️: Stops all enemies for 3 seconds
 - **Nuke** 💣: Instantly destroys the nearest enemy
 - **Heal** ❤️: Restores 1 life point
@@ -47,7 +46,6 @@ After completing each wave, players receive a loot box containing one upgrade wi
 
 ##### Area of Effect / Utility Upgrades
 - **Chain Lightning** (Common-Legendary): Chance to damage nearby enemies on word completion (10-30% chance, 1-3 targets)
-- **Bomb Words** (Rare-Legendary): Special enemies spawn with area damage (100-200px radius, 0-2s freeze)
 
 ##### Economic / Strategic Upgrades
 - **Reroll Luck** (Common-Legendary): Increased chance for higher rarity upgrades (+5% to +25%)

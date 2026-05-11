@@ -75,7 +75,7 @@ class GameState {
         this.powerUps = [];
         this.gameRunning = false;
         this.upgrades = [];
-        this.typingDamage = 1; // For tank enemies
+        this.typingDamage = 1; // For double HP enemies
         this.comboDamageBonus = 0;
         this.enemySpeedMultiplier = 1;
         this.spawnDelayMultiplier = 1;
@@ -105,12 +105,6 @@ class GameState {
         this.chainLightningDamage = 1; // Damage dealt to chained enemies
         this.chainLightningSlow = 0; // Slow duration in seconds
         
-        // Bomb Words system
-        this.bombWordChance = 0; // Chance for enemy to spawn with bomb word
-        this.bombRadius = 100; // Explosion radius in pixels
-        this.bombFreezeDuration = 0; // Freeze duration in seconds
-        this.bombWords = ['BOOM', 'BLAST', 'BANG', 'POW', 'KABOOM']; // Special bomb words
-        
         // Armor Shred system
         this.armorShredActive = false; // Whether armor shred is active
         this.doubleWordReduction = 0.3; // Percentage reduction for double enemy second words
@@ -128,18 +122,17 @@ class GameState {
 
 // Enemy Class
 class Enemy {
-    constructor(word, type, x, y, isBombWord = false) {
+    constructor(word, type, x, y) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.word = word;
         this.type = type;
-        this.hp = type === 'tank' || type === 'double' ? 2 : 1;
+        this.hp = type === 'double' ? 2 : 1;
         this.maxHp = this.hp;
         this.x = x;
         this.y = y;
         this.speed = this.getBaseSpeed();
         this.element = null;
         this.originalWord = word;
-        this.isBombWord = isBombWord; // Flag for bomb word enemies
         this.spawnDelay = 500; // 0.5 second delay before starting to fall
         this.spawnTime = Date.now(); // Track when this enemy was spawned
     }
@@ -150,7 +143,6 @@ class Enemy {
         
         switch (this.type) {
             case 'fast': return baseSpeed * 1.5 * (game ? game.difficultySettings.fastSpeedBonus : 1);
-            case 'tank': return baseSpeed * 0.8 * (game ? game.difficultySettings.tankSpeedBonus : 1);
             case 'double': return baseSpeed * 0.8 * (game ? game.difficultySettings.doubleSpeedBonus : 1);
             default: return baseSpeed * (game ? game.difficultySettings.enemySpeedBonus : 1);
         }
@@ -215,7 +207,7 @@ const UPGRADES = [
     // Common upgrades (60% chance)
     {
         name: '+5% Typing Damage',
-        description: 'Deal more damage to tank enemies',
+        description: 'Deal more damage to double HP enemies',
         rarity: 'common',
         apply: (gameState) => {
             gameState.typingDamage *= 1.05;
@@ -269,7 +261,7 @@ const UPGRADES = [
     // Rare upgrades (25% chance)
     {
         name: '+10% Typing Damage',
-        description: 'Deal significantly more damage to tank enemies',
+        description: 'Deal significantly more damage to double HP enemies',
         rarity: 'rare',
         apply: (gameState) => {
             gameState.typingDamage *= 1.1;
@@ -319,21 +311,11 @@ const UPGRADES = [
             gameState.chainLightningSlow = 1;
         }
     },
-    {
-        name: 'Bomb Words I',
-        description: 'Bomb words clear 100px radius',
-        rarity: 'rare',
-        apply: (gameState) => {
-            gameState.bombWordChance = 8;
-            gameState.bombRadius = 100;
-            gameState.bombFreezeDuration = 0;
-        }
-    },
     
     // Epic upgrades (12% chance)
     {
         name: '+15% Typing Damage',
-        description: 'Deal massive damage to tank enemies',
+        description: 'Deal massive damage to double HP enemies',
         rarity: 'epic',
         apply: (gameState) => {
             gameState.typingDamage *= 1.15;
@@ -384,21 +366,11 @@ const UPGRADES = [
             gameState.chainLightningSlow = 0;
         }
     },
-    {
-        name: 'Bomb Words II',
-        description: 'Bomb words clear 150px radius + 1s freeze',
-        rarity: 'epic',
-        apply: (gameState) => {
-            gameState.bombWordChance = 10;
-            gameState.bombRadius = 150;
-            gameState.bombFreezeDuration = 1;
-        }
-    },
     
     // Legendary upgrades (3% chance)
     {
         name: '+25% Typing Damage',
-        description: 'Deal devastating damage to tank enemies',
+        description: 'Deal devastating damage to double HP enemies',
         rarity: 'legendary',
         apply: (gameState) => {
             gameState.typingDamage *= 1.25;
@@ -448,16 +420,6 @@ const UPGRADES = [
             gameState.chainLightningTargets = 3;
             gameState.chainLightningDamage = 1;
             gameState.chainLightningSlow = 0;
-        }
-    },
-    {
-        name: 'Bomb Words III',
-        description: 'Bomb words clear 200px radius + 2s freeze',
-        rarity: 'legendary',
-        apply: (gameState) => {
-            gameState.bombWordChance = 12;
-            gameState.bombRadius = 200;
-            gameState.bombFreezeDuration = 2;
         }
     },
     {
@@ -742,7 +704,6 @@ const DIFFICULTY_SETTINGS = {
         spawnDelayMultiplier: 1.3,   // 30% slower spawning
         enemySpeedBonus: 0.7,
         fastSpeedBonus: 0.7,
-        tankSpeedBonus: 0.7,
         doubleSpeedBonus: 0.7
     },
     medium: {
@@ -750,7 +711,6 @@ const DIFFICULTY_SETTINGS = {
         spawnDelayMultiplier: 1.0,   // Normal spawning
         enemySpeedBonus: 1.0,
         fastSpeedBonus: 1.0,
-        tankSpeedBonus: 1.0,
         doubleSpeedBonus: 1.0
     },
     hard: {
@@ -758,7 +718,6 @@ const DIFFICULTY_SETTINGS = {
         spawnDelayMultiplier: 0.85,   // 15% faster spawning
         enemySpeedBonus: 1.3,
         fastSpeedBonus: 1.3,
-        tankSpeedBonus: 1.3,
         doubleSpeedBonus: 1.3
     }
 };
@@ -983,13 +942,6 @@ class TypeSlopGame {
                 const type = batchTypes[Math.floor(Math.random() * batchTypes.length)];
                 const wordList = this.getWordListForType(type);
                 let word = wordList[Math.floor(Math.random() * wordList.length)];
-                let isBombWord = false;
-                
-                // Check if this enemy should be a bomb word
-                if (this.gameState.bombWordChance > 0 && Math.random() * 100 < this.gameState.bombWordChance) {
-                    word = this.gameState.bombWords[Math.floor(Math.random() * this.gameState.bombWords.length)];
-                    isBombWord = true;
-                }
                 
                 // Ensure words spawn fully on screen with safe margins
                 const enemyWidth = 120; // Estimated maximum enemy width including padding
@@ -997,7 +949,7 @@ class TypeSlopGame {
                 const maxX = Math.max(0, this.gameArea.offsetWidth - enemyWidth - margin);
                 const x = margin + Math.random() * maxX;
                 
-                const enemy = new Enemy(word, type, x, 0, isBombWord);
+                const enemy = new Enemy(word, type, x, 0);
                 this.gameState.enemies.push(enemy);
                 this.createEnemyElement(enemy);
                 
@@ -1088,10 +1040,10 @@ class TypeSlopGame {
 
     createEnemyElement(enemy) {
         const element = document.createElement('div');
-        element.className = `enemy ${enemy.type}${enemy.isBombWord ? ' bomb-word' : ''}`;
+        element.className = `enemy ${enemy.type}`;
         
         // Create HP display for multi-HP enemies
-        if ((enemy.type === 'tank' || enemy.type === 'double') && enemy.hp > 1) {
+        if (enemy.type === 'double' && enemy.hp > 1) {
             const hpDisplay = document.createElement('div');
             hpDisplay.className = 'enemy-hp';
             hpDisplay.textContent = `HP:${enemy.hp}`;
@@ -1351,70 +1303,6 @@ class TypeSlopGame {
         }, 100);
     }
 
-    triggerBombExplosion(sourceX, sourceY) {
-        console.log('[BOMB] Explosion triggered at position:', sourceX, sourceY);
-        
-        // Find enemies within explosion radius
-        const enemiesInRadius = this.findEnemiesInRadius(sourceX, sourceY, this.gameState.bombRadius);
-        
-        // Create visual explosion effect
-        this.createBombExplosionEffect(sourceX, sourceY);
-        
-        // Damage all enemies in radius
-        enemiesInRadius.forEach(enemy => {
-            const destroyed = enemy.takeDamage(1); // Bomb deals 1 damage to all in radius
-            
-            // Apply freeze effect if applicable
-            if (this.gameState.bombFreezeDuration > 0) {
-                this.applySlowToEnemy(enemy, this.gameState.bombFreezeDuration);
-            }
-            
-            if (destroyed) {
-                this.gameState.enemies = this.gameState.enemies.filter(e => e.id !== enemy.id);
-                enemy.element.remove();
-                this.gameState.score += 3; // Reduced score for bomb kills
-                this.gameState.enemiesDefeated++;
-                this.updateEnemyDefeatedDisplay();
-            } else {
-                enemy.element.classList.add('bomb-damaged');
-                setTimeout(() => enemy.element.classList.remove('bomb-damaged'), 500);
-            }
-        });
-    }
-
-    findEnemiesInRadius(sourceX, sourceY, radius) {
-        return this.gameState.enemies.filter(enemy => {
-            const distance = Math.sqrt(Math.pow(enemy.x - sourceX, 2) + Math.pow(enemy.y - sourceY, 2));
-            return distance <= radius;
-        });
-    }
-
-    createBombExplosionEffect(x, y) {
-        const explosion = document.createElement('div');
-        explosion.className = 'bomb-explosion';
-        explosion.style.position = 'absolute';
-        explosion.style.left = `${x}px`;
-        explosion.style.top = `${y}px`;
-        explosion.style.width = `${this.gameState.bombRadius * 2}px`;
-        explosion.style.height = `${this.gameState.bombRadius * 2}px`;
-        explosion.style.borderRadius = '50%';
-        explosion.style.background = 'radial-gradient(circle, rgba(255,200,0,0.8) 0%, rgba(255,100,0,0.6) 50%, rgba(255,0,0,0.4) 100%)';
-        explosion.style.transform = 'translate(-50%, -50%)';
-        explosion.style.zIndex = '999';
-        explosion.style.boxShadow = '0 0 30px rgba(255,100,0,0.8)';
-        explosion.style.opacity = '1';
-        
-        this.enemiesContainer.appendChild(explosion);
-        
-        // Animate explosion
-        setTimeout(() => {
-            explosion.style.transform = 'translate(-50%, -50%) scale(1.5)';
-            explosion.style.opacity = '0';
-            explosion.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
-            setTimeout(() => explosion.remove(), 500);
-        }, 50);
-    }
-
     grantBonusUpgrade() {
         // Get a random upgrade with higher rarity bias
         const bonusRarityRoll = Math.random();
@@ -1495,11 +1383,6 @@ class TypeSlopGame {
                 this.triggerChainLightning(enemy.x, enemy.y);
             }
             
-            // Trigger bomb explosion if this was a bomb word
-            if (enemy.isBombWord) {
-                this.triggerBombExplosion(enemy.x, enemy.y);
-            }
-            
             // Increment enemies defeated counter
             this.gameState.enemiesDefeated++;
             this.updateEnemyDefeatedDisplay();
@@ -1514,7 +1397,7 @@ class TypeSlopGame {
             }
             
             // Chance to drop power-up
-            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.1;
+            const dropChance = this.gameState.powerUpCheatActive ? 1.0 : 0.2;
             if (Math.random() < dropChance) {
                 console.log('[POWERUP] Dropping power-up from enemy:', enemy.word);
                 this.dropPowerUp(enemy.x, enemy.y);
@@ -1530,28 +1413,7 @@ class TypeSlopGame {
             }
             
             // Update enemy text to show new HP or word change
-            if (enemy.type === 'tank') {
-                const hpDisplay = enemy.element.querySelector('.enemy-hp');
-                const wordDisplay = enemy.element.querySelector('.enemy-word');
-                
-                if (enemy.hp > 1) {
-                    if (!hpDisplay) {
-                        // Add HP display if it doesn't exist
-                        const hpDiv = document.createElement('div');
-                        hpDiv.className = 'enemy-hp';
-                        hpDiv.textContent = `HP:${enemy.hp}`;
-                        enemy.element.insertBefore(hpDiv, wordDisplay);
-                    } else {
-                        hpDisplay.textContent = `HP:${enemy.hp}`;
-                    }
-                } else {
-                    // Remove HP display if HP is 1
-                    if (hpDisplay) {
-                        hpDisplay.remove();
-                    }
-                }
-                wordDisplay.textContent = enemy.word;
-            } else if (enemy.type === 'double') {
+            if (enemy.type === 'double') {
                 const hpDisplay = enemy.element.querySelector('.enemy-hp');
                 const wordDisplay = enemy.element.querySelector('.enemy-word');
                 
