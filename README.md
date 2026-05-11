@@ -19,6 +19,7 @@ TypeSlop challenges players to type words displayed on enemies to destroy them b
 - **Normal Enemies** (Blue): Standard speed, medium-length words (4-7 letters)
 - **Fast Enemies** (Red): 50% faster movement, short words (3-5 letters)
 - **Double HP Enemies** (Purple): 20% slower movement, 2 health points, changes word when first hit
+- **Bomb Word Enemies** (Orange/Red): Special enemies with words like "BOOM", "BLAST" that create area explosions when destroyed
 
 ### Power-ups (10% drop chance)
 - **Freeze** ❄️: Stops all enemies for 3 seconds
@@ -39,6 +40,23 @@ After completing each wave, players receive a loot box containing one upgrade wi
 - **Legendary** (3% chance): Gold - Game-changing abilities
 
 #### Upgrade Categories
+
+##### Accuracy & Precision Upgrades
+- **Focus Fire** (Common-Legendary): Consecutive correct letters grant damage bonuses (1-5% per letter, max 5-25%)
+- **Auto-Correct** (Legendary): First typo in each word is automatically corrected
+
+##### Area of Effect / Utility Upgrades
+- **Chain Lightning** (Common-Legendary): Chance to damage nearby enemies on word completion (10-30% chance, 1-3 targets)
+- **Bomb Words** (Rare-Legendary): Special enemies spawn with area damage (100-200px radius, 0-2s freeze)
+
+##### Economic / Strategic Upgrades
+- **Reroll Luck** (Common-Legendary): Increased chance for higher rarity upgrades (+5% to +25%)
+- **Wave Skip Bonus** (Legendary): Perfect waves (no typos) grant bonus upgrades
+
+##### Balancing Solutions
+- **Armor Shred** (Epic): Double enemies change to ultra-short 3-letter words after first hit
+
+##### Classic Upgrades
 - **Typing Damage**: Increases damage against multi-HP enemies
 - **Slow-Mo Enhancements**: Longer duration and shorter cooldowns
 - **Enemy Control**: Slower enemy spawning and movement
@@ -77,6 +95,10 @@ After completing each wave, players receive a loot box containing one upgrade wi
 - Save slow-mo for emergency situations
 - Prioritize fast enemies when they appear
 - Use power-ups strategically - don't let them expire
+- With Focus Fire upgrades, type longer words consecutively for damage bonuses
+- Target bomb word enemies for area damage when overwhelmed
+- Perfect waves (no typos) grant bonus upgrades with Wave Skip Bonus
+- Use Armor Shred to counter double enemy bottlenecks in high waves
 
 ## 🏗️ Technical Details
 
@@ -126,6 +148,9 @@ type-slop/
 - **Loot Box Opening**: Spinning card reveal animation
 - **Power-up Effects**: Visual feedback for abilities
 - **Combo Popups**: Celebratory combo milestone indicators
+- **Chain Lightning**: Cyan lightning arcs between enemies
+- **Bomb Explosions**: Radial orange explosion effects
+- **Bonus Upgrade Notifications**: Glowing perfect wave rewards
 
 ## 🔧 Customization
 
@@ -183,4 +208,4 @@ The game manages multiple states seamlessly:
 
 ---
 
-**TypeSlop** - Test your typing skills in this addictive rogue-like adventure! How many waves can you survive?
+**TypeSlop** - Test your typing skills in this addictive rogue-like adventure! Build powerful upgrade combinations, master new mechanics, and discover how many waves you can survive!
