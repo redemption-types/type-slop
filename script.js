@@ -56,6 +56,11 @@ class GameState {
         this.powerUpCheatActive = false; // Easter egg: 100% power-up drops
         this.freezeActive = false;
         this.freezeEndTime = 0;
+        
+        // Cute-tooth-stack system
+        this.wordsCompleted = 0; // Total words completed
+        this.toothStack = []; // Array of tooth positions (left to right, max 10)
+        this.toothKings = 0; // Number of king teeth (each represents 10 completed words)
     }
 }
 
@@ -396,7 +401,7 @@ class Lootbox {
 
     async waitForAnimation() {
         return new Promise(resolve => {
-            setTimeout(resolve, 750); // 0.75 seconds for CSGO-style animation
+            setTimeout(resolve,600); // 0.6 seconds for CSGO-style animation
         });
     }
 
@@ -520,6 +525,11 @@ class TypeSlopGame {
         this.enemiesDefeatedDisplay = document.getElementById('enemies-defeated');
         this.enemiesToDefeatDisplay = document.getElementById('enemies-to-defeat');
         
+        // Tooth system elements
+        this.toothStackContainer = document.getElementById('tooth-stack-container');
+        this.toothStack = document.getElementById('tooth-stack');
+        this.toothKingCounter = document.getElementById('tooth-king-counter');
+        
         this.lastSpawnTime = 0;
         this.spawnInterval = 2000; // Base spawn interval
         this.animationId = null;
@@ -616,6 +626,9 @@ class TypeSlopGame {
         this.gameState.gameRunning = true;
         this.gameState.enemySpeedMultiplier = this.difficultySettings.enemySpeedMultiplier;
         this.gameState.spawnDelayMultiplier = this.difficultySettings.spawnDelayMultiplier;
+        
+        // Reset tooth system
+        this.resetToothSystem();
         
         // Clear any timeouts
         if (this.slowMoTimeout) clearTimeout(this.slowMoTimeout);
@@ -898,6 +911,9 @@ class TypeSlopGame {
             this.updateEnemyDefeatedDisplay();
             console.log('[DESTROY] Enemy destroyed. Enemies defeated:', this.gameState.enemiesDefeated);
             
+            // Add cute tooth for completed word
+            this.addCuteTooth();
+            
             // Show combo popup
             if (this.gameState.combo > 0 && this.gameState.combo % 5 === 0) {
                 this.showComboPopup(enemy.x, enemy.y, this.gameState.combo);
@@ -1134,12 +1150,20 @@ class TypeSlopGame {
             this.clearEnemyHighlights();
         }
         
-        // Open lootbox with 'P' key (when upgrade screen is active)
+        // Open lootbox with 'P' key (when upgrade screen is active and lootbox not opened)
         if (e.key.toLowerCase() === 'p' && !this.upgradeScreen.classList.contains('hidden')) {
             e.preventDefault();
             const lootboxElement = document.getElementById('lootbox');
-            if (lootboxElement && !lootboxElement.classList.contains('opening')) {
+            const resultContainer = document.getElementById('lootbox-result');
+            const continueBtn = document.getElementById('continue-btn');
+            
+            // Check if lootbox is not opened yet
+            if (lootboxElement && !lootboxElement.classList.contains('opening') && resultContainer.style.display !== 'block') {
                 this.openLootbox();
+            }
+            // Check if result is shown and we can continue (use continue button visibility as backup)
+            else if ((resultContainer.style.display === 'block') || (continueBtn && continueBtn.offsetParent !== null)) {
+                this.applyUpgradeAndContinue();
             }
         }
         
@@ -1729,6 +1753,90 @@ class TypeSlopGame {
                 }
             }, 100);
         }
+    }
+
+    // Cute Tooth Stack System Methods
+    addCuteTooth() {
+        this.gameState.wordsCompleted++;
+        this.gameState.toothStack.push(this.gameState.wordsCompleted);
+        
+        // Check if we've completed 10 words (create a king)
+        if (this.gameState.wordsCompleted % 10 === 0) {
+            this.gameState.toothKings++;
+            this.gameState.toothStack = []; // Reset stack after creating a king
+            this.updateToothKingCounter(true); // true = show celebration animation
+        } else {
+            // Keep only last 10 teeth in the stack
+            if (this.gameState.toothStack.length > 10) {
+                this.gameState.toothStack.shift();
+            }
+        }
+        
+        this.updateToothDisplay();
+    }
+
+    updateToothDisplay() {
+        // Clear current tooth display
+        this.toothStack.innerHTML = '';
+        
+        // Add teeth to display (left to right)
+        this.gameState.toothStack.forEach((wordNumber, index) => {
+            const tooth = document.createElement('div');
+            tooth.className = 'cute-tooth';
+            
+            // Add bounce animation for new teeth
+            if (index === this.gameState.toothStack.length - 1) {
+                tooth.classList.add('new-tooth');
+            }
+            
+            this.toothStack.appendChild(tooth);
+        });
+        
+        // Show/hide tooth stack container based on content
+        if (this.gameState.toothStack.length > 0) {
+            this.toothStackContainer.style.display = 'block';
+        } else {
+            this.toothStackContainer.style.display = 'none';
+        }
+        
+        // Update king counter
+        this.updateToothKingCounter(false);
+    }
+
+    updateToothKingCounter(celebrate = false) {
+        // Clear current content
+        this.toothKingCounter.innerHTML = '';
+        
+        // Show/hide king counter container based on content
+        if (this.gameState.toothKings > 0) {
+            this.toothKingCounter.style.display = 'flex';
+            
+            // Add king icon
+            const kingIcon = document.createElement('div');
+            kingIcon.className = 'king-icon';
+            this.toothKingCounter.appendChild(kingIcon);
+            
+            // Add counter text
+            const counterText = document.createElement('span');
+            counterText.textContent = `x ${this.gameState.toothKings}`;
+            this.toothKingCounter.appendChild(counterText);
+        } else {
+            this.toothKingCounter.style.display = 'none';
+        }
+        
+        if (celebrate) {
+            this.toothKingCounter.classList.add('king-award');
+            setTimeout(() => {
+                this.toothKingCounter.classList.remove('king-award');
+            }, 1000);
+        }
+    }
+
+    resetToothSystem() {
+        this.gameState.wordsCompleted = 0;
+        this.gameState.toothStack = [];
+        this.gameState.toothKings = 0;
+        this.updateToothDisplay();
     }
 }
 

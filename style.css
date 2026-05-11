@@ -2742,6 +2742,124 @@ body::before {
     }
 }
 
+/* Cute Tooth Stack System */
+#tooth-king-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 5;
+}
+
+#tooth-stack-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 5;
+}
+
+.tooth-stack {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.cute-tooth {
+    width: 32px;
+    height: 32px;
+    background-image: url('cute-tooth-stack.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    animation: tooth-sparkle 2s ease-in-out infinite;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes tooth-sparkle {
+    0%, 100% { 
+        transform: scale(1) rotate(0deg);
+        filter: brightness(1);
+    }
+    50% { 
+        transform: scale(1.1) rotate(5deg);
+        filter: brightness(1.2);
+    }
+}
+
+.cute-tooth.new-tooth {
+    animation: tooth-bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes tooth-bounce-in {
+    0% { 
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% { 
+        transform: scale(1.3) rotate(10deg);
+        opacity: 1;
+    }
+    100% { 
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.tooth-king-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
+    padding: 4px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.king-icon {
+    width: 20px;
+    height: 20px;
+    background-image: url('cute-tooth-king.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.tooth-king-counter.king-award {
+    animation: king-celebration 1s ease-out;
+}
+
+@keyframes king-celebration {
+    0% { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% { 
+        transform: scale(1.3);
+        filter: brightness(1.5) hue-rotate(20deg);
+    }
+    100% { 
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
 /* Touch device optimizations */
 @media (hover: none) and (pointer: coarse) {
     .stat:hover::before,

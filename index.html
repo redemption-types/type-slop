@@ -33,6 +33,10 @@
         <main id="game-area" role="main" aria-label="Game play area">
             <div id="enemies-container" aria-live="polite" aria-atomic="false"></div>
             <div id="player-line" aria-hidden="true"></div>
+            <div id="tooth-king-counter" class="tooth-king-counter" aria-hidden="true" style="display: none;"></div>
+            <div id="tooth-stack-container" aria-hidden="true" style="display: none;">
+                <div id="tooth-stack" class="tooth-stack"></div>
+            </div>
         </main>
 
         <!-- Upgrades Display (Right Column) -->
@@ -76,7 +80,7 @@
                 <div class="lootbox-result" id="lootbox-result" style="display: none;">
                     <h3>You Got:</h3>
                     <div class="result-card" id="result-card"></div>
-                    <button id="continue-btn" class="continue-button" aria-label="Continue to next wave">Continue</button>
+                    <button id="continue-btn" class="continue-button" aria-label="Continue to next wave">Continue (P)</button>
                 </div>
             </div>
         </section>
