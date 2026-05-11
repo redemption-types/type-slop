@@ -365,11 +365,11 @@ body::before {
 }
 
 .enemy.normal {
-    background: linear-gradient(135deg, rgba(74, 144, 226, 0.8) 0%, rgba(52, 152, 219, 0.8) 100%);
-    border: 2px solid rgba(74, 144, 226, 0.9);
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.8) 0%, rgba(39, 174, 96, 0.8) 100%);
+    border: 2px solid rgba(46, 204, 113, 0.9);
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
 }
 
 .enemy.fast {
@@ -465,6 +465,28 @@ body::before {
 
 .enemy.double.happy-damaged {
     animation: happy-bounce 0.6s ease-out, happy-glow 0.6s ease-out;
+}
+
+.enemy.frozen,
+.enemy.normal.frozen,
+.enemy.fast.frozen,
+.enemy.double.frozen {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+    border: 2px solid #3498db !important;
+    box-shadow: 0 4px 20px rgba(52, 152, 219, 0.8) !important;
+    animation: frozen-shimmer 0.5s ease-in-out infinite;
+    filter: brightness(1.1) !important;
+}
+
+@keyframes frozen-shimmer {
+    0%, 100% { 
+        filter: brightness(1);
+        transform: scale(1);
+    }
+    50% { 
+        filter: brightness(1.4);
+        transform: scale(1.02);
+    }
 }
 
 /* Input Area */
@@ -752,21 +774,22 @@ body::before {
 .powerup-legend {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1vh, 12px);
+    gap: clamp(15px, 2vh, 24px);
     margin-top: clamp(12px, 1.5vh, 15px);
-    padding: clamp(10px, 1.5vh, 15px);
+    padding: clamp(18px, 2.7vh, 27px);
     background: rgba(0,0,0,0.3);
-    border-radius: 10px;
+    border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .powerup-item {
     display: flex;
     align-items: center;
-    gap: clamp(10px, 1.5vw, 15px);
-    padding: clamp(6px, 0.8vh, 10px);
+    justify-content: center;
+    gap: clamp(18px, 3vw, 30px);
+    padding: clamp(12px, 1.8vh, 21px);
     background: rgba(0,0,0,0.2);
-    border-radius: 8px;
+    border-radius: 15px;
 }
 
 .powerup-emoji {
@@ -776,8 +799,8 @@ body::before {
 }
 
 .powerup-image {
-    width: clamp(40px, 5.5vw, 55px);
-    height: clamp(40px, 5.5vw, 55px);
+    width: clamp(75px, 10.5vw, 105px);
+    height: clamp(75px, 10.5vw, 105px);
     object-fit: contain;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
     transition: all 0.3s ease;
@@ -790,9 +813,11 @@ body::before {
 
 .powerup-desc {
     color: #fff;
-    font-size: clamp(9px, 1.3vw, 12px);
-    line-height: 1.2;
+    font-size: clamp(16px, 2.4vw, 22px);
+    line-height: 1.4;
     font-weight: 500;
+    text-align: center;
+    flex: 1;
 }
 
 .enemy-legend {
@@ -809,6 +834,7 @@ body::before {
 .enemy-item {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: clamp(8px, 1.3vw, 13px);
     padding: clamp(5px, 0.7vh, 8px);
     background: rgba(0,0,0,0.2);
@@ -828,8 +854,8 @@ body::before {
 }
 
 .enemy-preview.normal {
-    background: linear-gradient(135deg, rgba(74, 144, 226, 0.8) 0%, rgba(52, 152, 219, 0.8) 100%);
-    border: 2px solid rgba(74, 144, 226, 0.9);
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.8) 0%, rgba(39, 174, 96, 0.8) 100%);
+    border: 2px solid rgba(46, 204, 113, 0.9);
 }
 
 .enemy-preview.fast {
@@ -859,6 +885,8 @@ body::before {
     font-size: clamp(9px, 1.3vw, 12px);
     line-height: 1.2;
     font-weight: 500;
+    text-align: center;
+    flex: 1;
 }
 
 .difficulty-selection {
@@ -2855,15 +2883,15 @@ body::before {
 .tooth-king-counter {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
+    gap: 8px;
+    font-size: 16px;
     font-weight: bold;
     color: #FFD700;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.8);
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.2) 100%);
-    padding: 4px 12px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 215, 0, 0.4);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.9), 0 2px 4px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 165, 0, 0.25) 100%);
+    padding: 6px 16px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(255, 215, 0, 0.5);
     backdrop-filter: blur(10px);
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -2871,13 +2899,13 @@ body::before {
 }
 
 .king-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     background-image: url('cute-tooth-king.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
 }
 
 .tooth-king-counter.king-award {
