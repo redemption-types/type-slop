@@ -1762,17 +1762,37 @@ class TypeSlopGame {
         
         // Check if we've completed 10 words (create a king)
         if (this.gameState.wordsCompleted % 10 === 0) {
-            this.gameState.toothKings++;
-            this.gameState.toothStack = []; // Reset stack after creating a king
-            this.updateToothKingCounter(true); // true = show celebration animation
+            // Play disappearing animation for all teeth before creating king
+            this.playTeethDisappearingAnimation(() => {
+                this.gameState.toothKings++;
+                this.gameState.toothStack = []; // Reset stack after creating a king
+                this.updateToothKingCounter(true); // true = show celebration animation
+            });
         } else {
-            // Keep only last 10 teeth in the stack
+            // Keep only last 10 teeth in stack
             if (this.gameState.toothStack.length > 10) {
                 this.gameState.toothStack.shift();
             }
+            this.updateToothDisplay();
         }
+    }
+
+    playTeethDisappearingAnimation(callback) {
+        // Add disappearing class to all existing teeth
+        const teethElements = this.toothStack.querySelectorAll('.cute-tooth');
+        teethElements.forEach((tooth, index) => {
+            // Stagger the animation for each tooth
+            setTimeout(() => {
+                tooth.classList.add('disappearing');
+            }, index * 50); // 50ms delay between each tooth
+        });
         
-        this.updateToothDisplay();
+        // Wait for animation to complete before callback
+        setTimeout(() => {
+            this.toothStack.innerHTML = ''; // Clear the container
+            this.toothStackContainer.style.display = 'none'; // Hide container
+            callback();
+        }, 800 + (teethElements.length * 50)); // Wait for all animations
     }
 
     updateToothDisplay() {
