@@ -93,7 +93,7 @@ class GameState {
         this.powerUps = [];
         this.gameRunning = false;
         this.upgrades = [];
-        this.typingDamage = 1; // For double HP enemies
+        this.typingDamage = 1; // Base damage for Focus Fire calculations
         this.comboDamageBonus = 0;
         this.enemySpeedMultiplier = 1;
         this.spawnDelayMultiplier = 1;
@@ -228,11 +228,11 @@ const RARITY_PROBABILITIES = {
 const UPGRADES = [
     // Common upgrades (60% chance)
     {
-        name: '+5% Typing Damage',
-        description: 'Deal more damage to double HP enemies',
+        name: '+5% Enemy Spawn Delay',
+        description: 'Enemies spawn slower',
         rarity: 'common',
         apply: (gameState) => {
-            gameState.typingDamage *= 1.05;
+            gameState.spawnDelayMultiplier *= 1.05;
         }
     },
     {
@@ -290,11 +290,11 @@ const UPGRADES = [
     
     // Rare upgrades (25% chance)
     {
-        name: '+10% Typing Damage',
-        description: 'Deal significantly more damage to double HP enemies',
+        name: '+5% Combo Damage Bonus',
+        description: 'Combos deal more damage',
         rarity: 'rare',
         apply: (gameState) => {
-            gameState.typingDamage *= 1.1;
+            gameState.comboDamageBonus += 0.05;
         }
     },
     {
@@ -352,11 +352,11 @@ const UPGRADES = [
     
     // Epic upgrades (12% chance)
     {
-        name: '+15% Typing Damage',
-        description: 'Deal massive damage to double HP enemies',
+        name: '+10% Combo Damage Bonus',
+        description: 'Combos deal significantly more damage',
         rarity: 'epic',
         apply: (gameState) => {
-            gameState.typingDamage *= 1.15;
+            gameState.comboDamageBonus += 0.1;
         }
     },
     {
@@ -415,11 +415,11 @@ const UPGRADES = [
     
     // Legendary upgrades (3% chance)
     {
-        name: '+25% Typing Damage',
-        description: 'Deal devastating damage to double HP enemies',
+        name: 'Combo Master',
+        description: 'Combo damage bonus doubled',
         rarity: 'legendary',
         apply: (gameState) => {
-            gameState.typingDamage *= 1.25;
+            gameState.comboDamageBonus *= 2;
         }
     },
     {
@@ -1056,14 +1056,14 @@ class TypeSlopGame {
             // Waves 4-7: short + medium (50/50 mix)
             return ['short', 'short', 'medium'];
         } else if (wave <= 12) {
-            // Waves 8-12: short + medium but more medium density
-            return ['short', 'medium', 'medium'];
+            // Waves 8-12: short + medium + very low long word occurrence (5%)
+            return ['short', 'medium', 'medium', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long']; // 5% long words
         } else if (wave <= 20) {
-            // Waves 13-20: all types
-            return ['short', 'medium', 'long'];
+            // Waves 13-20: all types with low long word occurrence (8%)
+            return ['short', 'medium', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long', 'long']; // 8% long words
         } else {
-            // Waves 20+: all types but more hard ones
-            return ['short', 'medium', 'medium', 'long', 'long'];
+            // Waves 20+: all types but slightly more long words (15%)
+            return ['short', 'medium', 'medium', 'long', 'long', 'long', 'long', 'long', 'long', 'long']; // 15% long words
         }
     }
 
@@ -1286,7 +1286,7 @@ class TypeSlopGame {
         
         // Calculate damage bonus based on consecutive correct letters
         const bonusPercentage = Math.min(this.gameState.consecutiveCorrectLetters * this.gameState.focusFireBonus, this.gameState.maxFocusFireBonus);
-        return Math.floor(bonusPercentage / 100 * this.gameState.typingDamage);
+        return Math.floor(bonusPercentage / 100);
     }
 
     triggerChainLightning(sourceX, sourceY) {
@@ -1430,7 +1430,7 @@ class TypeSlopGame {
     destroyEnemy(enemy) {
         // Calculate Focus Fire damage bonus
         const focusFireDamage = this.calculateFocusFireDamage();
-        const damage = this.gameState.typingDamage + focusFireDamage + Math.floor(this.gameState.combo / 5) * this.gameState.comboDamageBonus;
+        const damage = 1 + focusFireDamage + Math.floor(this.gameState.combo / 5) * this.gameState.comboDamageBonus;
         const destroyed = enemy.takeDamage(damage);
         
         if (destroyed) {
